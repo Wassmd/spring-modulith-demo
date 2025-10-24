@@ -1,0 +1,15 @@
+POST http://localhost:8080/orders
+Content-Type: application/json
+
+{
+  "lineItems": [
+    {
+      "productId": 1,
+      "quantity": 1
+    },
+    {
+      "productId": 2,
+      "quantity": 2
+    }
+  ]
+}

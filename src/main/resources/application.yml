@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: spring-modulith-demo
+  docker:
+    compose:
+      lifecycle-management: start_only
+  sql:
+    init:
+      mode: always
+  aop:
+    proxy-target-class: true
+  modulith:
+    events:
+      republish-outstanding-events-on-restart: true
+      externalization:
+        enabled: true
+      jdbc:
+        schema-initialization:
+          enabled: true
