@@ -1,0 +1,1 @@
+package com.paxier.spring_modulith_demo.product;
