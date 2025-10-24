@@ -1,17 +1,18 @@
 package com.paxier.spring_modulith_demo.product;
 
 import com.paxier.spring_modulith_demo.order.OrderPlaceEvent;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 class ProductsService {
 
   @ApplicationModuleListener
   void on(OrderPlaceEvent event) throws InterruptedException {
-    System.out.println("Receiving... OrderPlaceEvent for orderId: " + event.orderId());
+    log.info("Receiving... OrderPlaceEvent for orderId: " + event.orderId());
     Thread.sleep(5000);
-    System.out.println("Received OrderPlaceEvent for orderId: " + event.orderId());
-
+    log.info("Received OrderPlaceEvent for orderId: " + event.orderId());
   }
 }
