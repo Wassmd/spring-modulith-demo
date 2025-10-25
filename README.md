@@ -25,8 +25,7 @@ spring-modulith-demo/
 │   │   ├── Order.java
 │   │   ├── OrderService.java
 │   │   ├── OrderController.java
-│   │   ├── OrderPlaceEvent.java
-│   │   ├── OrderEventKafkaPublisher.java  # Kafka externalization
+│   │   ├── OrderPlaceEvent.java # Externalized event for kafka
 │   │   ├── OrderRepository.java
 │   │   └── LineItem.java
 │   └── product/           # Product module
@@ -81,7 +80,7 @@ This enables:
 
 2. **Run the Application**:
    ```bash
-   ./mvnw spring-boot:run
+   mvn spring-boot:run
    ```
 
    The application will:
