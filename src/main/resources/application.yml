@@ -12,8 +12,10 @@ spring:
   modulith:
     events:
       republish-outstanding-events-on-restart: true
-      externalization:
-        enabled: true
       jdbc:
         schema-initialization:
           enabled: true
+  kafka:
+    bootstrap-servers: localhost:9092
+
+

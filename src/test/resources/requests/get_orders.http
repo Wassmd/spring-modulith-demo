@@ -4,11 +4,11 @@ Content-Type: application/json
 {
   "lineItems": [
     {
-      "productId": 1,
+      "product": 1,
       "quantity": 1
     },
     {
-      "productId": 3,
+      "product": 11,
       "quantity": 2
     }
   ]
