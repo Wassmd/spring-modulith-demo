@@ -13,6 +13,7 @@ This project demonstrates **Spring Modulith** - a modular monolith architecture 
 
 ## 📦 Project Structure
 
+
 ```
 spring-modulith-demo/
 ├── src/main/java/com/paxier/spring_modulith_demo/
@@ -28,13 +29,20 @@ spring-modulith-demo/
 │   │   ├── OrderPlaceEvent.java # Externalized event for kafka
 │   │   ├── OrderRepository.java
 │   │   └── LineItem.java
+│   │   └── package-info.java
+|   |
 │   └── product/           # Product module
 │       └── ProductsService.java
+│   │   └── package-info.java
 └── src/test/java/
     └── ModularityTests.java   # Module structure verification
 ```
 
 ## 🏗️ Architecture
+
+### Module Dependencies Diagram
+
+![Module Dependencies](src/test/resources/Module_dependencies.png)
 
 ### Module Communication Flow
 
