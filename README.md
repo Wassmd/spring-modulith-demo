@@ -1,6 +1,6 @@
 # Spring Modulith Demo
 
-This project demonstrates **Spring Modulith** - a modular monolith architecture using Spring Boot. It showcases how to build a well-structured application with clear module boundaries, inter-module communication via Spring Events, and event externalization to Apache Kafka.
+This project demonstrates **Spring Modulith** - a modular monolith architecture using Spring Boot. It showcases how to build a well-structured application with clear module boundaries, inter-module communication via Spring Events, and event externalization to Apache Kafka. Later on if needed, this one of module can be separated out into a µ-services.
 
 ## 🎯 Key Features
 
@@ -12,6 +12,7 @@ This project demonstrates **Spring Modulith** - a modular monolith architecture 
 - **Auto-generated Documentation**: PlantUML diagrams and module documentation generated from code
 
 ## 📦 Project Structure
+
 
 ```
 spring-modulith-demo/
@@ -28,13 +29,20 @@ spring-modulith-demo/
 │   │   ├── OrderPlaceEvent.java # Externalized event for kafka
 │   │   ├── OrderRepository.java
 │   │   └── LineItem.java
+│   │   └── package-info.java
+|   |
 │   └── product/           # Product module
 │       └── ProductsService.java
+│   │   └── package-info.java
 └── src/test/java/
     └── ModularityTests.java   # Module structure verification
 ```
 
 ## 🏗️ Architecture
+
+### Module Dependencies Diagram
+
+![Module Dependencies](src/test/resources/Module_dependencies.png)
 
 ### Module Communication Flow
 
