@@ -167,20 +167,6 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
 ```
-
-### Key Dependencies
-
-```xml
-<dependency>
-    <groupId>org.springframework.modulith</groupId>
-    <artifactId>spring-modulith-starter-jdbc</artifactId>
-</dependency>
-<dependency>
-    <groupId>org.springframework.kafka</groupId>
-    <artifactId>spring-kafka</artifactId>
-</dependency>
-```
-
 ## 📚 Spring Modulith Concepts
 
 ### 1. Module Definition
@@ -210,6 +196,21 @@ The `event_publication` table tracks:
 
 ## 🔍 Verification
 
+### Modulith Observability
+
+Spring Modulith provides Actuator endpoints to view the application module structure and metadata:
+
+**View Module Structure**:
+```bash
+curl http://localhost:8080/actuator/modulith
+```
+
+This endpoint shows:
+- Module boundaries and relationships
+- Module dependencies
+- Event listeners and publishers
+- Externalized events configuration
+- 
 ### Check Event Publication Table
 
 ```sql
