@@ -15,10 +15,16 @@ spring:
       jdbc:
         schema-initialization:
           enabled: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/mydatabase
+    username: myuser
+    password: secret
+    driver-class-name: org.postgresql.Driver
   kafka:
     bootstrap-servers: localhost:9092
 management:
   endpoints:
     web:
       exposure:
-        include: modulith,modulithmetadata,health,info
+        include: modulith, health, info, prometheus
+

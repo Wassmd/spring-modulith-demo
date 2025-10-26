@@ -8,8 +8,8 @@ Content-Type: application/json
       "quantity": 1
     },
     {
-      "product": 11,
-      "quantity": 2
+      "product": 12,
+      "quantity": 200
     }
   ]
 }
