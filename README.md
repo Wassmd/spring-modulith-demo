@@ -83,7 +83,7 @@ This enables:
 
 1. **Start Infrastructure** (PostgreSQL + Kafka):
    ```bash
-   docker-compose up -d
+   docker compose up -d
    ```
 
 2. **Run the Application**:
