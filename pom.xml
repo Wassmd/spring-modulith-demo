@@ -31,6 +31,8 @@
         <spring-modulith.version>1.4.3</spring-modulith.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
+        <zonky.embedded-postgres.version>2.1.1</zonky.embedded-postgres.version>
+        <zonky.embedded-database-spring-test.version>2.6.0</zonky.embedded-database-spring-test.version>
     </properties>
 	<dependencies>
 		<dependency>
@@ -106,6 +108,18 @@
 			<artifactId>spring-modulith-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>io.zonky.test</groupId>
+            <artifactId>embedded-postgres</artifactId>
+            <version>${zonky.embedded-postgres.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.zonky.test</groupId>
+            <artifactId>embedded-database-spring-test</artifactId>
+            <version>${zonky.embedded-database-spring-test.version}</version>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

@@ -17,6 +17,6 @@ class OrderService {
   void place(Order order) {
     var saved = orderRepository.save(order);
     log.info("Order placed: " + saved);
-    publisher.publishEvent(new OrderPlaceEvent(saved.orderId(), saved.lineItems()));
+    publisher.publishEvent(new OrderPlaceEvent(saved.id(), saved.lineItems()));
   }
 }
