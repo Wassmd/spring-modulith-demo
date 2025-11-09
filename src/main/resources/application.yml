@@ -7,8 +7,6 @@ spring:
   sql:
     init:
       mode: always
-  aop:
-    proxy-target-class: true
   modulith:
     events:
       republish-outstanding-events-on-restart: true
