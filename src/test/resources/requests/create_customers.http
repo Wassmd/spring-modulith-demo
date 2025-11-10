@@ -1,0 +1,25 @@
+### Create a new customer with address
+POST http://localhost:8080/customers
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "address": {
+    "street": "123 Main Street",
+    "city": "New York",
+    "zipCode": "10001"
+  }
+}
+
+###
+
+### Get all customers
+GET http://localhost:8080/customers
+
+###
+
+### Get customer by ID
+GET http://localhost:8080/customers/1
+
+###
+

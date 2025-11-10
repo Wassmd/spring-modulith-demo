@@ -18,9 +18,13 @@ This project demonstrates **Spring Modulith** - a modular monolith architecture 
 spring-modulith-demo/
 ├── src/main/java/com/paxier/spring_modulith_demo/
 │   ├── SpringModulithDemoApplication.java
-│   ├── customer/          # Customer module
+│   ├── customer/          # Customer module (JPA)
 │   │   ├── Address.java
 │   │   ├── Customer.java
+│   │   ├── CustomerController.java
+│   │   ├── CustomerService.java
+│   │   ├── CustomerRepository.java
+│   │   ├── AddressRepository.java
 │   │   └── package-info.java
 │   ├── order/             # Order module
 │   │   ├── Order.java
@@ -35,7 +39,11 @@ spring-modulith-demo/
 │       └── ProductsService.java
 │   │   └── package-info.java
 └── src/test/java/
-    └── ModularityTests.java   # Module structure verification
+    ├── ModularityTests.java   # Module structure verification
+    └── customer/
+        ├── CustomerIntegrationTest.java
+        ├── CustomerServiceTest.java
+        └── CustomerControllerTest.java
 ```
 
 ## 🏗️ Architecture
@@ -43,6 +51,26 @@ spring-modulith-demo/
 ### Module Dependencies Diagram
 
 ![Module Dependencies](src/test/resources/Module_dependencies.png)
+
+### Modules Overview
+
+#### 1. Customer Module (JPA-based)
+- **Technology**: Spring Data JPA with separate tables
+- **Entities**: `Customer` (customers table) and `Address` (addresses table)
+- **Relationship**: OneToOne with cascade operations
+- **Endpoints**:
+  - `POST /customers` - Create customer with address
+  - `GET /customers` - Get all customers
+  - `GET /customers/{id}` - Get customer by ID
+- **Testing**: Full integration tests with H2 database
+
+#### 2. Order Module (Spring Data JDBC)
+- **Technology**: Spring Data JDBC with event externalization
+- **Communication**: Publishes `OrderPlaceEvent` to Kafka
+- **Event Tracking**: Uses `event_publication` table
+
+#### 3. Product Module
+- **Service Layer**: Business logic for products
 
 ### Module Communication Flow
 
@@ -108,7 +136,28 @@ This enables:
      }'
    ```
 
-4. **Verify Kafka Message**:
+4. **Create a Customer with Address** (JPA Example):
+   ```bash
+   curl -X POST http://localhost:8080/customers \
+     -H "Content-Type: application/json" \
+     -d '{
+       "name": "John Doe",
+       "address": {
+         "street": "123 Main Street",
+         "city": "New York",
+         "zipCode": "10001"
+       }
+     }'
+   ```
+   
+   This demonstrates **JPA's OneToOne relationship** - Customer and Address are saved in separate tables but linked via foreign key.
+
+5. **Get All Customers**:
+   ```bash
+   curl http://localhost:8080/customers
+   ```
+
+6. **Verify Kafka Message**:
    ```bash
    # Enter Kafka container
    docker exec -it <kafka-container-id> bash
