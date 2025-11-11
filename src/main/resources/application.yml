@@ -28,9 +28,18 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   kafka:
     bootstrap-servers: localhost:9092
+weather:
+  api:
+    key: demo  # Replace with your actual OpenWeatherMap API key
+    base-url: https://api.openweathermap.org/data/2.5
 management:
   endpoints:
     web:
       exposure:
         include: modulith, health, info, prometheus
+
+springdoc:
+  swagger-ui:
+    path: "/apidoc"
+    groups-order: desc
 
