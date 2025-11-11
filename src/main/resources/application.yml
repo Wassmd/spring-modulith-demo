@@ -28,6 +28,12 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   kafka:
     bootstrap-servers: localhost:9092
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/spring-modulith
+          jwk-set-uri: http://localhost:8180/realms/spring-modulith/protocol/openid-connect/certs
 weather:
   api:
     key: demo  # Replace with your actual OpenWeatherMap API key

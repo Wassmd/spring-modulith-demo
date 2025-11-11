@@ -8,6 +8,8 @@ This project demonstrates **Spring Modulith** - a modular monolith architecture 
 - **Event-Driven Communication**: Modules communicate using Spring's `ApplicationEventPublisher` 
 - **Kafka Event Externalization**: Internal events are published to Kafka topics using custom event publishers
 - **Event Publication Tracking**: JDBC-based event publication registry automatically creates `event_publication` table to track event status
+- **OAuth2/OIDC Authentication**: Secured with Keycloak for enterprise-grade authentication and authorization
+- **Role-Based Access Control**: Fine-grained authorization using Keycloak realm and client roles
 - **Modularity Verification**: Unit tests verify module structure and dependencies
 - **Auto-generated Documentation**: PlantUML diagrams and module documentation generated from code
 
@@ -109,12 +111,32 @@ This enables:
 
 ### Running the Application
 
-1. **Start Infrastructure** (PostgreSQL + Kafka):
+1. **Start Infrastructure** (PostgreSQL + Kafka + Keycloak):
    ```bash
    docker compose up -d
    ```
 
-2. **Run the Application**:
+   This will start:
+   - PostgreSQL on `localhost:5432`
+   - Kafka on `localhost:9092`
+   - Keycloak on `localhost:8180`
+
+2. **Configure Keycloak** (First-time setup):
+   
+   Follow the detailed setup guide in [KEYCLOAK_SETUP.md](KEYCLOAK_SETUP.md) to:
+   - Create the `spring-modulith` realm
+   - Configure OAuth2 client
+   - Create test users and roles
+   - Get access tokens
+
+   **Quick Setup**:
+   - Access Keycloak Admin Console: http://localhost:8180 (admin/admin)
+   - Create realm: `spring-modulith`
+   - Create client: `spring-modulith-client`
+   - Create user: `testuser` / `password`
+   - Assign roles: `user`, `admin`
+
+3. **Run the Application**:
    ```bash
    mvn spring-boot:run
    ```
@@ -123,10 +145,23 @@ This enables:
    - Start on `http://localhost:8080`
    - Auto-create the `event_publication` table
    - Connect to Kafka at `localhost:9092`
+   - Validate JWT tokens from Keycloak
 
-3. **Create an Order**:
+4. **Get Access Token**:
+   ```bash
+   TOKEN=$(curl -X POST http://localhost:8180/realms/spring-modulith/protocol/openid-connect/token \
+     -H "Content-Type: application/x-www-form-urlencoded" \
+     -d "client_id=spring-modulith-client" \
+     -d "client_secret=YOUR_CLIENT_SECRET" \
+     -d "username=testuser" \
+     -d "password=password" \
+     -d "grant_type=password" | jq -r '.access_token')
+   ```
+
+5. **Create an Order** (Protected Endpoint):
    ```bash
    curl -X POST http://localhost:8080/orders \
+     -H "Authorization: Bearer $TOKEN" \
      -H "Content-Type: application/json" \
      -d '{
        "orderId": 1,
@@ -136,9 +171,10 @@ This enables:
      }'
    ```
 
-4. **Create a Customer with Address** (JPA Example):
+6. **Create a Customer with Address** (Protected Endpoint):
    ```bash
    curl -X POST http://localhost:8080/customers \
+     -H "Authorization: Bearer $TOKEN" \
      -H "Content-Type: application/json" \
      -d '{
        "name": "John Doe",
@@ -215,7 +251,61 @@ spring:
           enabled: true  # Auto-create event_publication table
   kafka:
     bootstrap-servers: localhost:9092
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/spring-modulith
+          jwk-set-uri: http://localhost:8180/realms/spring-modulith/protocol/openid-connect/certs
 ```
+
+### Public Endpoints
+
+The following endpoints don't require authentication:
+- `/actuator/**` - Actuator endpoints
+- `/apidoc/**` - Swagger UI
+- `/v3/api-docs/**` - OpenAPI documentation
+- `/swagger-ui/**` - Swagger UI resources
+
+All other endpoints require a valid JWT token from Keycloak.
+
+## 🔐 Security & Authentication
+
+This application uses **OAuth2/OIDC** with Keycloak for authentication and authorization.
+
+### Authentication Flow
+
+1. **User logs in** to Keycloak (or gets token programmatically)
+2. **Keycloak issues JWT token** with user information and roles
+3. **Client sends token** in `Authorization: Bearer <token>` header
+4. **Spring validates token** against Keycloak's public keys
+5. **Roles are extracted** from token claims (realm_access, resource_access)
+6. **Access granted/denied** based on user's roles
+
+### Role-Based Authorization
+
+You can secure methods using `@PreAuthorize`:
+
+```java
+@PreAuthorize("hasRole('admin')")
+public void deleteOrder(int orderId) {
+    // Only admins can delete
+}
+
+@PreAuthorize("hasAnyRole('user', 'customer')")
+public Order getOrder(int orderId) {
+    // Users and customers can view
+}
+```
+
+### Keycloak Setup
+
+See [KEYCLOAK_SETUP.md](KEYCLOAK_SETUP.md) for detailed instructions on:
+- Creating realm and client
+- Managing users and roles
+- Getting access tokens
+- Testing with curl/Postman
+
 ## 📚 Spring Modulith Concepts
 
 ### 1. Module Definition
@@ -286,7 +376,9 @@ docker exec -it <kafka-container-id> kafka-console-consumer \
 
 - **Spring Boot 3.5.7**
 - **Spring Modulith 1.4.3**
-- **Spring Data JDBC**
+- **Spring Security 6.x** with OAuth2 Resource Server
+- **Keycloak 26.0.7** for Authentication & Authorization
+- **Spring Data JDBC** & **Spring Data JPA**
 - **Spring Kafka**
 - **PostgreSQL**
 - **Apache Kafka 7.6.1**
