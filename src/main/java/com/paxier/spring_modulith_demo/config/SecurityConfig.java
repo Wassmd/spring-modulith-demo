@@ -1,5 +1,6 @@
 package com.paxier.spring_modulith_demo.config;
 
+import java.util.ArrayList;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,75 +22,46 @@ import java.util.stream.Stream;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/actuator/**",
-                    "/apidoc/**",
-                    "/v3/api-docs/**",
-                    "/swagger-ui/**",
-                    "/swagger-ui.html"
-                ).permitAll()
-                .anyRequest().authenticated()
-            )
-            .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
-            )
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            );
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .csrf(AbstractHttpConfigurer::disable)
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers(
+                "/actuator/**",
+                "/apidoc/**",
+                "/v3/api-docs/**",
+                "/swagger-ui/**",
+                "/swagger-ui.html"
+            ).permitAll()
+            .anyRequest().authenticated()
+        )
+        .oauth2ResourceServer(oauth2 -> oauth2
+            .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
+        )
+        .sessionManagement(session -> session
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        );
 
-        return http.build();
-    }
+    return http.build();
+  }
 
-    @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
-            // Extract standard OAuth2 scopes
-            JwtGrantedAuthoritiesConverter scopesConverter = new JwtGrantedAuthoritiesConverter();
-            Collection<GrantedAuthority> scopeAuthorities = scopesConverter.convert(jwt);
+  @Bean
+  public JwtAuthenticationConverter jwtAuthenticationConverter() {
+    JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+    converter.setJwtGrantedAuthoritiesConverter(jwt -> createGrantedAuthorities(jwt.getClaims()));
+    return converter;
+  }
 
-            // Extract realm roles from Keycloak
-            Map<String, Object> realmAccess = jwt.getClaim("realm_access");
-            Collection<GrantedAuthority> realmRoles = List.of();
-            if (realmAccess != null && realmAccess.get("roles") instanceof List<?> roles) {
-                realmRoles = roles.stream()
-                    .filter(role -> role instanceof String)
-                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                    .map(GrantedAuthority.class::cast)
-                    .toList();
-            }
+  private Collection<GrantedAuthority> createGrantedAuthorities(Map<String, Object> claims) {
+    Map<String, Object> realmAccess = (Map<String, Object>) claims.get("realm_access");
+    List<String> roles = (List<String>) realmAccess.get("roles");
+    return roles.stream()
+        .map("ROLE_"::concat)
+        .map(SimpleGrantedAuthority::new)
+        .map(GrantedAuthority.class::cast)
+        .toList();
+  }
 
-            // Extract resource roles from Keycloak
-            Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
-            Collection<GrantedAuthority> resourceRoles = List.of();
-            if (resourceAccess != null) {
-                resourceRoles = resourceAccess.values().stream()
-                    .filter(resource -> resource instanceof Map)
-                    .flatMap(resource -> {
-                        Object rolesObj = ((Map<?, ?>) resource).get("roles");
-                        if (rolesObj instanceof List<?> roles) {
-                            return roles.stream()
-                                .filter(role -> role instanceof String)
-                                .map(role -> new SimpleGrantedAuthority("ROLE_" + role));
-                        }
-                        return Stream.empty();
-                    })
-                    .map(GrantedAuthority.class::cast)
-                    .toList();
-            }
-
-            // Combine all authorities
-            return Stream.of(scopeAuthorities, realmRoles, resourceRoles)
-                .flatMap(Collection::stream)
-                .toList();
-        });
-
-        return converter;
-    }
 }
 

@@ -32,8 +32,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8180/realms/spring-modulith
-          jwk-set-uri: http://localhost:8180/realms/spring-modulith/protocol/openid-connect/certs
+          issuer-uri: http://localhost:8180/realms/master
+          jwk-set-uri: http://localhost:8180/realms/master/protocol/openid-connect/certs
 weather:
   api:
     key: demo  # Replace with your actual OpenWeatherMap API key

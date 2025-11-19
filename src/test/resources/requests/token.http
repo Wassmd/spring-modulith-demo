@@ -1,0 +1,10 @@
+POST http://localhost:8180/realms/master/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = client_credentials &
+client_id = {{KEYCLOAK_CLIENT_ID}} &
+client_secret = {{KEYCLOAK_CLIENT_SECRET}}
+
+> {%
+    client.global.set("auth_token", response.body.access_token)
+%}

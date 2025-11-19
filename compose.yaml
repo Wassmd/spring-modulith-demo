@@ -29,6 +29,7 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
     ports:
       - '9092:9092'
+
   keycloak:
     image: 'keycloak/keycloak:23.0'
     command: start-dev
