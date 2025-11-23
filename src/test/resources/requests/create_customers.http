@@ -1,6 +1,7 @@
 ### Create a new customer with address
 POST http://localhost:8080/customers
 Content-Type: application/json
+Authorization: Bearer {{auth_token}}
 
 {
   "name": "John Doe",
@@ -15,6 +16,7 @@ Content-Type: application/json
 
 ### Get all customers
 GET http://localhost:8080/customers
+Authorization: Bearer {{auth_token}}
 
 ###
 
