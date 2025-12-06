@@ -6,5 +6,8 @@ client_id = {{KEYCLOAK_CLIENT_ID}} &
 client_secret = {{KEYCLOAK_CLIENT_SECRET}}
 
 > {%
-    client.global.set("auth_token", response.body.access_token)
+    client.global.set("auth_token", response.body.access_token);
+    const expiresIn = response.body.expires_in;
+    client.log("✅ Token expires in: " + expiresIn + " seconds (" + (expiresIn/(60*60)) + " hours)");
 %}
+

@@ -1,0 +1,8 @@
+POST http://localhost:8080/products
+Authorization: Bearer {{auth_token}}
+content-type: application/json
+
+{
+    "name": "Milch",
+    "price": 0.99
+ }

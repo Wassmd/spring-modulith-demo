@@ -49,4 +49,8 @@ springdoc:
   swagger-ui:
     path: "/apidoc"
     groups-order: desc
+logging:
+  level:
+    org.springframework.jdbc.datasource.init: DEBUG
+    org.springframework.boot.sql.init: DEBUG
 

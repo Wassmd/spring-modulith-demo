@@ -21,3 +21,9 @@ create table if not exists customers (
     name varchar(255) not null,
     address_id int references addresses(id)
 );
+
+create table if not exists product (
+    id serial primary key,
+    name varchar(255) not null,
+    price decimal(10, 2) not null
+);
