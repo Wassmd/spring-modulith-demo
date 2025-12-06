@@ -1,4 +1,9 @@
 package com.paxier.spring_modulith_demo.product.dto;
 
-public record Product(String name, Double price) {
+import jakarta.validation.constraints.NotNull;
+
+public record Product(
+    Long productId,
+    @NotNull String name,
+    @NotNull Double price) {
 }
