@@ -1,5 +1,6 @@
 package com.paxier.spring_modulith_demo.product.entity;
 
+import com.paxier.spring_modulith_demo.shared.entity.AuditedEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,10 +11,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "product")
 @Setter
 @Getter
-public class ProductEntity {
+@Table(name = "product", schema = "product")
+public class ProductEntity extends AuditedEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id", nullable = false)

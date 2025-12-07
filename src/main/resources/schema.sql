@@ -22,8 +22,14 @@ create table if not exists customers (
     address_id int references addresses(id)
 );
 
-create table if not exists product (
+CREATE SCHEMA IF NOT EXISTS product;
+
+create table if not exists product.product (
     id serial primary key,
     name varchar(255) not null,
-    price decimal(10, 2) not null
+    price decimal(10, 2) not null,
+    created_at timestamp not null,
+    modified_at timestamp,
+    created_by varchar(255) default 'system',
+    modified_by varchar(255)
 );
