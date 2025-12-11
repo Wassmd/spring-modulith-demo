@@ -1,3 +1,6 @@
+CREATE SCHEMA IF NOT EXISTS product;
+CREATE SCHEMA IF NOT EXISTS supplier;
+
 create table if not exists orders (
     id serial primary key
 );
@@ -21,8 +24,6 @@ create table if not exists customers (
     name varchar(255) not null,
     address_id int references addresses(id)
 );
-
-CREATE SCHEMA IF NOT EXISTS product;
 
 create table if not exists product.product (
     id serial primary key,
