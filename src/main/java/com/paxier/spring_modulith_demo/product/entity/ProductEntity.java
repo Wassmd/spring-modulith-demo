@@ -14,12 +14,20 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Setter
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "product", schema = "product")
 public class ProductEntity extends AuditedEntity {
   @Id
@@ -31,7 +39,4 @@ public class ProductEntity extends AuditedEntity {
   private String name;
   @Column(nullable = false)
   private double price;
-
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "productEntity", orphanRemoval = true, cascade = ALL)
-  private List<SupplierEntity> suppliers = new ArrayList<>();
 }
