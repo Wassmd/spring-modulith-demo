@@ -3,16 +3,13 @@ package com.paxier.spring_modulith_demo.product.Repository;
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.ZONKY;
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode.AFTER_EACH_TEST_METHOD;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 import com.paxier.spring_modulith_demo.product.entity.ProductEntity;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @DataJpaTest
 @EnableJpaAuditing
@@ -33,5 +30,10 @@ class ProductRepositoryTest {
     assertNotNull(savedEntity);
     assertEquals("Test Product", savedEntity.getName());
     assertEquals(9.99, savedEntity.getPrice());
+
+    var fetchedEntity = repository.findById(savedEntity.getProductId());
+    assertTrue(fetchedEntity.isPresent());
+    assertEquals("Test Product", fetchedEntity.get().getName());
+    assertEquals(9.99, fetchedEntity.get().getPrice());
   }
 }
