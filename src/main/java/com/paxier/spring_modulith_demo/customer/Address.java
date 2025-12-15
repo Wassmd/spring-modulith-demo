@@ -2,10 +2,7 @@ package com.paxier.spring_modulith_demo.customer;
 
 import com.paxier.spring_modulith_demo.customer.entity.CustomerEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "address", schema = "customer")
@@ -25,8 +22,8 @@ public class Address {
     @Builder.Default
     private AddressType type = AddressType.HOME;
 
-    @ManyToOne
-    @JoinColumn(name = "customer_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id", nullable = false)
     private CustomerEntity customerEntity;
 }
 
