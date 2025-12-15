@@ -19,82 +19,80 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class CustomerServiceTest {
 
-    @Mock
-    private CustomerRepository customerRepository;
+  @Mock private CustomerRepository customerRepository;
 
-    @Mock
-    private AddressRepository addressRepository;
+  @Mock private AddressRepository addressRepository;
 
-    @InjectMocks
-    private CustomerService customerService;
+  @InjectMocks private CustomerService customerService;
 
-    private Customer testCustomer;
-    private Address testAddress;
+  private Customer testCustomer;
 
-    @BeforeEach
-    void setUp() {
-        testAddress = new Address(1L, "123 Main St", "New York", "10001");
-        testCustomer = new Customer(1L, "John Doe", testAddress);
-    }
+  @BeforeEach
+  void setUp() {
+    Address testAddress =
+        Address.builder().street("123 Main St").city("New York").zipCode("10001").build();
+    testCustomer = new Customer(1L, "John Doe", testAddress);
+  }
 
-    @Test
-    void shouldCreateCustomer() {
-        // Given
-        when(customerRepository.save(any(Customer.class))).thenReturn(testCustomer);
+  @Test
+  void shouldCreateCustomer() {
+    // Given
+    when(customerRepository.save(any(Customer.class))).thenReturn(testCustomer);
 
-        // When
-        Customer result = customerService.createCustomer(testCustomer);
+    // When
+    Customer result = customerService.createCustomer(testCustomer);
 
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.getName()).isEqualTo("John Doe");
-        assertThat(result.getAddress().getStreet()).isEqualTo("123 Main St");
-        verify(customerRepository, times(1)).save(testCustomer);
-    }
+    // Then
+    assertThat(result).isNotNull();
+    assertThat(result.getName()).isEqualTo("John Doe");
+    assertThat(result.getAddress().getStreet()).isEqualTo("123 Main St");
+    verify(customerRepository, times(1)).save(testCustomer);
+  }
 
-    @Test
-    void shouldGetAllCustomers() {
-        // Given
-        Address address2 = new Address(2L, "456 Oak Ave", "Los Angeles", "90001");
-        Customer customer2 = new Customer(2L, "Jane Smith", address2);
-        List<Customer> customers = Arrays.asList(testCustomer, customer2);
-        when(customerRepository.findAll()).thenReturn(customers);
+  @Test
+  void shouldGetAllCustomers() {
+    // Given
+    Address address2 =
+        Address.builder().street("456 Oak Ave").city("Los Angeles").zipCode("90001").build();
 
-        // When
-        List<Customer> result = customerService.getAllCustomers();
+    Customer customer2 = new Customer(2L, "Jane Smith", address2);
+    List<Customer> customers = Arrays.asList(testCustomer, customer2);
+    when(customerRepository.findAll()).thenReturn(customers);
 
-        // Then
-        assertThat(result).hasSize(2);
-        assertThat(result.get(0).getName()).isEqualTo("John Doe");
-        assertThat(result.get(1).getName()).isEqualTo("Jane Smith");
-        verify(customerRepository, times(1)).findAll();
-    }
+    // When
+    List<Customer> result = customerService.getAllCustomers();
 
-    @Test
-    void shouldGetCustomerById() {
-        // Given
-        when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
+    // Then
+    assertThat(result).hasSize(2);
+    assertThat(result.get(0).getName()).isEqualTo("John Doe");
+    assertThat(result.get(1).getName()).isEqualTo("Jane Smith");
+    verify(customerRepository, times(1)).findAll();
+  }
 
-        // When
-        Customer result = customerService.getCustomerById(1L);
+  @Test
+  void shouldGetCustomerById() {
+    // Given
+    when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
 
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(1L);
-        assertThat(result.getName()).isEqualTo("John Doe");
-        verify(customerRepository, times(1)).findById(1L);
-    }
+    // When
+    Customer result = customerService.getCustomerById(1L);
 
-    @Test
-    void shouldThrowExceptionWhenCustomerNotFound() {
-        // Given
-        when(customerRepository.findById(999L)).thenReturn(Optional.empty());
+    // Then
+    assertThat(result).isNotNull();
+    assertThat(result.getId()).isEqualTo(1L);
+    assertThat(result.getName()).isEqualTo("John Doe");
+    verify(customerRepository, times(1)).findById(1L);
+  }
 
-        // When & Then
-        assertThatThrownBy(() -> customerService.getCustomerById(999L))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Customer not found with id: 999");
-        verify(customerRepository, times(1)).findById(999L);
-    }
+  @Test
+  void shouldThrowExceptionWhenCustomerNotFound() {
+    // Given
+    when(customerRepository.findById(999L)).thenReturn(Optional.empty());
+
+    // When & Then
+    assertThatThrownBy(() -> customerService.getCustomerById(999L))
+        .isInstanceOf(RuntimeException.class)
+        .hasMessageContaining("Customer not found with id: 999");
+    verify(customerRepository, times(1)).findById(999L);
+  }
 }
-

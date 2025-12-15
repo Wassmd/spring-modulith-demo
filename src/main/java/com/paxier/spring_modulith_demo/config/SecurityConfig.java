@@ -18,12 +18,6 @@ import java.util.Map;
 @EnableWebSecurity
 public class SecurityConfig {
 
-//  @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
-//  private String issuerUri;
-//
-//  @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
-//  private String jwkSetUri;
-
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
@@ -48,18 +42,6 @@ public class SecurityConfig {
     return http.build();
   }
 
-//  @Bean
-//  public JwtDecoder jwtDecoder() {
-//    NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
-//
-//    OAuth2TokenValidator<Jwt> audienceValidator = new AudienceValidator("spring-modulith-demo-admin");
-//    OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(issuerUri);
-//    OAuth2TokenValidator<Jwt> withAudience = new DelegatingOAuth2TokenValidator<>(withIssuer, audienceValidator);
-//
-//    jwtDecoder.setJwtValidator(withAudience);
-//    return jwtDecoder;
-//  }
-
   @Bean
   public JwtAuthenticationConverter jwtAuthenticationConverter() {
     JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
@@ -76,26 +58,5 @@ public class SecurityConfig {
         .map(GrantedAuthority.class::cast)
         .toList();
   }
-
-  /**
-     * Custom validator to check JWT audience claim
-     */
-//    record AudienceValidator(String audience) implements OAuth2TokenValidator<Jwt> {
-//
-//    @Override
-//      public OAuth2TokenValidatorResult validate(Jwt jwt) {
-//        List<String> audiences = jwt.getAudience();
-//        if (audiences.contains(this.audience)) {
-//          return OAuth2TokenValidatorResult.success();
-//        }
-//        OAuth2Error error = new OAuth2Error(
-//            "invalid_token",
-//            "The required audience '" + this.audience + "' is missing",
-//            null
-//        );
-//        return OAuth2TokenValidatorResult.failure(error);
-//      }
-    //}
-
 }
 

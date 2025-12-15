@@ -31,7 +31,10 @@ class CustomerIntegrationTest {
 
     @Autowired
     private AddressRepository addressRepository;
-
+  Address address1 =
+      Address.builder().street("123 Main St").city("New York").zipCode("10001").build();
+  Address address2 =
+      Address.builder().street("456 Oak Ave").city("Los Angeles").zipCode("90001").build();
     @BeforeEach
     void setUp() {
         customerRepository.deleteAll();
@@ -41,7 +44,8 @@ class CustomerIntegrationTest {
     @Test
     void shouldCreateCustomerWithAddress() throws Exception {
         // Given
-        Address address = new Address("123 Main St", "New York", "10001");
+      Address address =
+          Address.builder().street("123 Main St").city("New York").zipCode("10001").build();
         Customer customer = new Customer(null, "John Doe", address);
 
         // When & Then
@@ -59,11 +63,10 @@ class CustomerIntegrationTest {
     @Test
     void shouldGetAllCustomers() throws Exception {
         // Given
-        Address address1 = new Address("123 Main St", "New York", "10001");
         Customer customer1 = new Customer(null, "John Doe", address1);
         customerRepository.save(customer1);
 
-        Address address2 = new Address("456 Oak Ave", "Los Angeles", "90001");
+
         Customer customer2 = new Customer(null, "Jane Smith", address2);
         customerRepository.save(customer2);
 
@@ -78,8 +81,7 @@ class CustomerIntegrationTest {
     @Test
     void shouldGetCustomerById() throws Exception {
         // Given
-        Address address = new Address("123 Main St", "New York", "10001");
-        Customer customer = new Customer(null, "John Doe", address);
+        Customer customer = new Customer(null, "John Doe", address1);
         Customer savedCustomer = customerRepository.save(customer);
 
         // When & Then
@@ -93,8 +95,7 @@ class CustomerIntegrationTest {
     @Test
     void shouldSaveAddressInSeparateTable() throws Exception {
         // Given
-        Address address = new Address("123 Main St", "New York", "10001");
-        Customer customer = new Customer(null, "John Doe", address);
+        Customer customer = new Customer(null, "John Doe", address1);
 
         // When
         mockMvc.perform(post("/customers")
