@@ -1,5 +1,6 @@
 package com.paxier.spring_modulith_demo.customer;
 
+import com.paxier.spring_modulith_demo.customer.model.Customer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

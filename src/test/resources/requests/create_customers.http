@@ -5,11 +5,20 @@ Authorization: Bearer {{auth_token}}
 
 {
   "name": "John Doe",
-  "address": {
+  "addresses": [
+    {
     "street": "123 Main Street",
     "city": "New York",
-    "zipCode": "10001"
-  }
+    "zipCode": "10001",
+    "type": "HOME"
+  },
+    {
+      "street": "Level 5, 456 Corporate Blvd",
+      "city": "New York",
+      "zipCode": "10002",
+      "type": "WORK"
+    }
+  ]
 }
 
 ###
@@ -21,7 +30,8 @@ Authorization: Bearer {{auth_token}}
 ###
 
 ### Get customer by ID
-GET http://localhost:8080/customers/1
+GET http://localhost:8080/customers/3
+Authorization: Bearer {{auth_token}}
 
 ###
 

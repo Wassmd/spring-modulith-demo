@@ -1,5 +1,6 @@
 package com.paxier.spring_modulith_demo.customer;
 
+import com.paxier.spring_modulith_demo.customer.entity.CustomerEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "addresses")
+@Table(name = "address", schema = "customer")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,6 +24,10 @@ public class Address {
 
     @Builder.Default
     private AddressType type = AddressType.HOME;
+
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private CustomerEntity customerEntity;
 }
 
 enum AddressType {

@@ -1,5 +1,7 @@
-package com.paxier.spring_modulith_demo.customer;
+package com.paxier.spring_modulith_demo.customer.controller;
 
+import com.paxier.spring_modulith_demo.customer.CustomerService;
+import com.paxier.spring_modulith_demo.customer.model.Customer;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

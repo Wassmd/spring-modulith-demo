@@ -1,5 +1,8 @@
 package com.paxier.spring_modulith_demo.customer;
 
+import com.paxier.spring_modulith_demo.customer.entity.CustomerEntity;
+import com.paxier.spring_modulith_demo.customer.mapper.CustomerMapper;
+import com.paxier.spring_modulith_demo.customer.model.Customer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,24 +13,26 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CustomerService {
 
-    private final CustomerRepository customerRepository;
-    private final AddressRepository addressRepository;
+  private final CustomerRepository customerRepository;
+  private final CustomerMapper customerMapper;
 
-    @Transactional
-    public Customer createCustomer(Customer customer) {
-        // Save address first (though cascade will handle this)
-        return customerRepository.save(customer);
-    }
+  @Transactional
+  public Customer createCustomer(Customer customer) {
+    // Save address first (though cascade will handle this)
+    CustomerEntity entity = customerRepository.save(customerMapper.toEntity(customer));
+    return customerMapper.toModel(entity);
+  }
 
-    @Transactional(readOnly = true)
-    public List<Customer> getAllCustomers() {
-        return customerRepository.findAll();
-    }
+  @Transactional(readOnly = true)
+  public List<Customer> getAllCustomers() {
+    return customerRepository.findAll().stream().map(customerMapper::toModel).toList();
+  }
 
-    @Transactional(readOnly = true)
-    public Customer getCustomerById(Long id) {
-        return customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found with id: " + id));
-    }
+  @Transactional(readOnly = true)
+  public Customer getCustomerById(Long id) {
+    return customerMapper.toModel(
+        customerRepository
+            .findById(id)
+            .orElseThrow(() -> new RuntimeException("Customer not found with id: " + id)));
+  }
 }
-

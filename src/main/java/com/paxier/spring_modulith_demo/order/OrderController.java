@@ -1,6 +1,6 @@
 package com.paxier.spring_modulith_demo.order;
 
-import com.paxier.spring_modulith_demo.customer.Customer;
+import com.paxier.spring_modulith_demo.customer.model.Customer;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;

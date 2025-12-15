@@ -5,6 +5,6 @@ import java.util.Set;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("orders")
+@Table(value = "order", schema = "order")
 record Order(@Id Integer id, @NotEmpty(message = "line items should not be empty") Set<LineItem> lineItems) {
 }
