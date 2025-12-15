@@ -37,6 +37,11 @@ public class ProductEntity extends AuditedEntity {
 
   @Column(nullable = false)
   private String name;
+
   @Column(nullable = false)
   private double price;
+
+  @Builder.Default
+  @OneToMany(mappedBy = "productEntity", cascade = ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  private List<SupplierEntity> suppliers = new ArrayList<>();
 }

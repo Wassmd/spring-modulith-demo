@@ -5,6 +5,7 @@ import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode.AFTER_E
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.paxier.spring_modulith_demo.product.entity.ProductEntity;
+import com.paxier.spring_modulith_demo.supplier.entity.SupplierEntity;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,13 @@ class ProductRepositoryTest {
         .price(9.99)
         .build();
 
+    SupplierEntity supplier = SupplierEntity.builder()
+        .supplierName("Test Supplier")
+        .productEntity(entity)
+        .build();
+
+    entity.getSuppliers().add(supplier);
+
     var savedEntity = repository.save(entity);
     assertNotNull(savedEntity);
     assertEquals("Test Product", savedEntity.getName());
@@ -35,5 +43,9 @@ class ProductRepositoryTest {
     assertTrue(fetchedEntity.isPresent());
     assertEquals("Test Product", fetchedEntity.get().getName());
     assertEquals(9.99, fetchedEntity.get().getPrice());
+
+    assertEquals(1, fetchedEntity.get().getSuppliers().size());
+    assertEquals("Test Supplier", fetchedEntity.get().getSuppliers().getFirst().getSupplierName());
+    assertEquals(1, fetchedEntity.get().getSuppliers().getFirst().getSupplierId());
   }
 }

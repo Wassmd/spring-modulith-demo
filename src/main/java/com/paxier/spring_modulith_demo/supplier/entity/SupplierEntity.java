@@ -13,18 +13,26 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Setter
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "supplier", schema = "supplier")
 public class SupplierEntity extends AuditedEntity {
   @Id
   @GeneratedValue(strategy = IDENTITY)
   @Column(name = "id", nullable = false)
   private long supplierId;
+
   private String supplierName;
 
   @ManyToOne(fetch = LAZY)
