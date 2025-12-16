@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 public class Customer {
-  private long id;
+  private Long id;
   private String name;
   private List<Address> addresses;
 }

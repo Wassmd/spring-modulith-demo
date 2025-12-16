@@ -4,17 +4,17 @@ Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "name": "Wasim Wasim",
+  "name": "Jasim Wasim",
   "addresses": [
     {
-    "street": "123 Main Street",
-    "city": "New York",
+    "street": "Dubai Marina Walk, Building 10",
+    "city": "Dubai",
     "zipCode": "10001",
     "type": "HOME"
   },
     {
-      "street": "Level 5, 456 Corporate Blvd",
-      "city": "New York",
+      "street": "Dubai Internet City, Building 5",
+      "city": "Dubai",
       "zipCode": "10002",
       "type": "WORK"
     }
