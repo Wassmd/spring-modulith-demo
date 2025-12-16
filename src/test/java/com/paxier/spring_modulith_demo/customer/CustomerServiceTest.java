@@ -1,6 +1,7 @@
 package com.paxier.spring_modulith_demo.customer;
 
 import com.paxier.spring_modulith_demo.customer.entity.AddressEntity;
+import com.paxier.spring_modulith_demo.customer.entity.CustomerEntity;
 import com.paxier.spring_modulith_demo.customer.model.Address;
 import com.paxier.spring_modulith_demo.customer.model.Customer;
 import com.paxier.spring_modulith_demo.customer.service.CustomerService;
@@ -29,19 +30,34 @@ class CustomerServiceTest {
 
   @InjectMocks private CustomerService customerService;
 
-  private Customer testCustomer;
+  private CustomerEntity testCustomerEntity;
+  private Customer testCustomer =
+      Customer.builder()
+          .id(1L)
+          .name("John Doe")
+          .addresses(
+              List.of(
+                  Address.builder().street("123 Main St").city("New York").zipCode("10001").build()))
+          .build();
+
+  private Address testAddress;
+  private AddressEntity testAddressEntity = AddressEntity.builder()
+      .street("123 Main St")
+      .city("New York")
+      .zipCode("10001")
+      .build();
 
   @BeforeEach
   void setUp() {
-    Address testAddress =
+    testAddress =
         Address.builder().street("123 Main St").city("New York").zipCode("10001").build();
-    testCustomer = new Customer(1L, "John Doe", List.of(testAddress));
+    testCustomerEntity = CustomerEntity.builder().name("John Doe").addresses(List.of(testAddressEntity)).build();
   }
 
   @Test
   void shouldCreateCustomer() {
     // Given
-    when(customerRepository.save(any(Customer.class))).thenReturn(testCustomer);
+    when(customerRepository.save(any(CustomerEntity.class))).thenReturn(testCustomerEntity);
 
     // When
     Customer result = customerService.createCustomer(testCustomer);
@@ -50,7 +66,7 @@ class CustomerServiceTest {
     assertThat(result).isNotNull();
     assertThat(result.getName()).isEqualTo("John Doe");
     assertThat(result.getAddresses().getFirst().street()).isEqualTo("123 Main St");
-    verify(customerRepository, times(1)).save(testCustomer);
+    verify(customerRepository, times(1)).save(testCustomerEntity);
   }
 
   @Test
@@ -59,8 +75,9 @@ class CustomerServiceTest {
     AddressEntity address2 =
         AddressEntity.builder().street("456 Oak Ave").city("Los Angeles").zipCode("90001").build();
 
-    Customer customer2 = new Customer(2L, "Jane Smith", address2);
-    List<Customer> customers = Arrays.asList(testCustomer, customer2);
+    CustomerEntity customer2 = new CustomerEntity(2L, "Jane Smith", List.of(address2));
+    List<CustomerEntity> customers = List.of(testCustomerEntity, customer2);
+
     when(customerRepository.findAll()).thenReturn(customers);
 
     // When
@@ -76,7 +93,7 @@ class CustomerServiceTest {
   @Test
   void shouldGetCustomerById() {
     // Given
-    when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
+    when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomerEntity));
 
     // When
     Customer result = customerService.getCustomerById(1L);

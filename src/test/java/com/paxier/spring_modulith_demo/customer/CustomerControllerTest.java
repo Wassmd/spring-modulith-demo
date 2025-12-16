@@ -41,7 +41,7 @@ class CustomerControllerTest {
   @BeforeEach
   void setUp() {
     Address testAddress = Address.builder().street("123 Main St").city("New York").zipCode("10001").build();
-    testCustomer = new Customer(1L, "John Doe", testAddress);
+    testCustomer = Customer.builder().name ( "John Doe").addresses(List.of(testAddress)).build() ;
   }
 
   @Test
@@ -77,7 +77,8 @@ class CustomerControllerTest {
             .zipCode("90001")
             .type(WORK)
             .build();
-    Customer customer2 = new Customer(2L, "Jane Smith", address2);
+    Customer customer2 =  Customer.builder().name("Jane Smith").addresses(List.of(address2)).build();
+
     List<Customer> customers = Arrays.asList(testCustomer, customer2);
     when(customerService.getAllCustomers()).thenReturn(customers);
 
