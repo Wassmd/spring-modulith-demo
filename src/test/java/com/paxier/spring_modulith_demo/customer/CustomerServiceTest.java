@@ -1,5 +1,7 @@
 package com.paxier.spring_modulith_demo.customer;
 
+import com.paxier.spring_modulith_demo.customer.entity.AddressEntity;
+import com.paxier.spring_modulith_demo.customer.model.Address;
 import com.paxier.spring_modulith_demo.customer.model.Customer;
 import com.paxier.spring_modulith_demo.customer.service.CustomerService;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +35,7 @@ class CustomerServiceTest {
   void setUp() {
     Address testAddress =
         Address.builder().street("123 Main St").city("New York").zipCode("10001").build();
-    testCustomer = new Customer(1L, "John Doe", testAddress);
+    testCustomer = new Customer(1L, "John Doe", List.of(testAddress));
   }
 
   @Test
@@ -47,15 +49,15 @@ class CustomerServiceTest {
     // Then
     assertThat(result).isNotNull();
     assertThat(result.getName()).isEqualTo("John Doe");
-    assertThat(result.getAddress().getStreet()).isEqualTo("123 Main St");
+    assertThat(result.getAddresses().getFirst().street()).isEqualTo("123 Main St");
     verify(customerRepository, times(1)).save(testCustomer);
   }
 
   @Test
   void shouldGetAllCustomers() {
     // Given
-    Address address2 =
-        Address.builder().street("456 Oak Ave").city("Los Angeles").zipCode("90001").build();
+    AddressEntity address2 =
+        AddressEntity.builder().street("456 Oak Ave").city("Los Angeles").zipCode("90001").build();
 
     Customer customer2 = new Customer(2L, "Jane Smith", address2);
     List<Customer> customers = Arrays.asList(testCustomer, customer2);

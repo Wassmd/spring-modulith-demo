@@ -1,6 +1,5 @@
 package com.paxier.spring_modulith_demo.customer.entity;
 
-import com.paxier.spring_modulith_demo.customer.Address;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,12 +12,14 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "customer", schema = "customer")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = "addresses")
 public class CustomerEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,5 +28,5 @@ public class CustomerEntity {
   private String name;
 
   @OneToMany(mappedBy = "customerEntity", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<Address> addresses = new ArrayList<>();
+  private List<AddressEntity> addresses = new ArrayList<>();
 }

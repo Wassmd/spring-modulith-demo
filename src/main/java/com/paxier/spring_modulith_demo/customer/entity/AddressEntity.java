@@ -1,6 +1,5 @@
-package com.paxier.spring_modulith_demo.customer;
+package com.paxier.spring_modulith_demo.customer.entity;
 
-import com.paxier.spring_modulith_demo.customer.entity.CustomerEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,7 +9,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Address {
+@ToString(exclude = "customerEntity") // to avoid circular reference in toString
+public class AddressEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,10 +25,5 @@ public class Address {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     private CustomerEntity customerEntity;
-}
-
-enum AddressType {
-    HOME,
-    WORK
 }
 

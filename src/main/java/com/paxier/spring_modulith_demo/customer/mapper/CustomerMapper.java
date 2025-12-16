@@ -1,6 +1,6 @@
 package com.paxier.spring_modulith_demo.customer.mapper;
 
-import com.paxier.spring_modulith_demo.customer.Address;
+import com.paxier.spring_modulith_demo.customer.entity.AddressEntity;
 import com.paxier.spring_modulith_demo.customer.entity.CustomerEntity;
 import com.paxier.spring_modulith_demo.customer.model.Customer;
 import org.mapstruct.AfterMapping;
@@ -28,7 +28,7 @@ public abstract class CustomerMapper {
     if (customerEntity.getAddresses() == null) {
       return;
     }
-    for (Address address : customerEntity.getAddresses()) {
+    for (AddressEntity address : customerEntity.getAddresses()) {
       if (address != null) {
         address.setCustomerEntity(customerEntity);
       }

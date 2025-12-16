@@ -1,6 +1,7 @@
 package com.paxier.spring_modulith_demo.customer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.paxier.spring_modulith_demo.customer.model.Address;
 import com.paxier.spring_modulith_demo.customer.model.Customer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

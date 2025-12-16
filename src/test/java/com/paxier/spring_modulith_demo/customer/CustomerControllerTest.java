@@ -2,6 +2,7 @@ package com.paxier.spring_modulith_demo.customer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paxier.spring_modulith_demo.customer.controller.CustomerController;
+import com.paxier.spring_modulith_demo.customer.model.Address;
 import com.paxier.spring_modulith_demo.customer.model.Customer;
 import com.paxier.spring_modulith_demo.customer.service.CustomerService;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.paxier.spring_modulith_demo.customer.AddressType.WORK;
+import static com.paxier.spring_modulith_demo.customer.entity.AddressType.WORK;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
