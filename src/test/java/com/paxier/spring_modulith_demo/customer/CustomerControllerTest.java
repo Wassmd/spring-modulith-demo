@@ -3,6 +3,7 @@ package com.paxier.spring_modulith_demo.customer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paxier.spring_modulith_demo.customer.controller.CustomerController;
 import com.paxier.spring_modulith_demo.customer.model.Customer;
+import com.paxier.spring_modulith_demo.customer.service.CustomerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

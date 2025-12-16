@@ -21,5 +21,8 @@ CREATE TABLE IF NOT EXISTS customer.address (
     zip_code VARCHAR(20),
     type smallint,
     customer_id BIGINT NOT NULL,
-    CONSTRAINT fk_customer_address FOREIGN KEY (customer_id) REFERENCES customer.customer(id) ON DELETE CASCADE
+    constraint fk_address_to_customer
+    FOREIGN KEY (customer_id)
+    references customer.customer(id)
+    on delete cascade
 );

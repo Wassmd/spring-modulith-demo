@@ -1,5 +1,6 @@
-package com.paxier.spring_modulith_demo.customer;
+package com.paxier.spring_modulith_demo.customer.service;
 
+import com.paxier.spring_modulith_demo.customer.CustomerRepository;
 import com.paxier.spring_modulith_demo.customer.entity.CustomerEntity;
 import com.paxier.spring_modulith_demo.customer.mapper.CustomerMapper;
 import com.paxier.spring_modulith_demo.customer.model.Customer;
@@ -19,7 +20,10 @@ public class CustomerService {
   @Transactional
   public Customer createCustomer(Customer customer) {
     // Save address first (though cascade will handle this)
-    CustomerEntity entity = customerRepository.save(customerMapper.toEntity(customer));
+    var customerEntity = customerMapper.toEntity(customer);
+
+    CustomerEntity entity = customerRepository.save(customerEntity);
+
     return customerMapper.toModel(entity);
   }
 

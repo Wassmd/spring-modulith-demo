@@ -4,7 +4,7 @@ Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "name": "Amna Wasim",
+  "name": "Wasim Wasim",
   "addresses": [
     {
     "street": "123 Main Street",
