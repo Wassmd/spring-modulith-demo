@@ -41,7 +41,7 @@ class CustomerControllerTest {
   @BeforeEach
   void setUp() {
     Address testAddress = Address.builder().street("123 Main St").city("New York").zipCode("10001").build();
-    testCustomer = Customer.builder().name ( "John Doe").addresses(List.of(testAddress)).build() ;
+    testCustomer = Customer.builder().id(1L).addresses(List.of(testAddress)).build() ;
   }
 
   @Test
