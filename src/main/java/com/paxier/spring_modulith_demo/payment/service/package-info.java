@@ -1,5 +1,2 @@
-@org.springframework.modulith.ApplicationModule(
-    displayName = "Payment Service Module",
-    allowedDependencies = { }
-)
+@org.springframework.modulith.NamedInterface("service")
 package com.paxier.spring_modulith_demo.payment.service;
