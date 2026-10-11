@@ -29,7 +29,9 @@ public class CustomerService {
 
   @Transactional(readOnly = true)
   public List<Customer> getAllCustomers() {
-    return customerRepository.findAll().stream().map(customerMapper::toModel).toList();
+    return customerRepository.findAll().stream()
+        .map(customerMapper::toModel)
+        .toList();
   }
 
   @Transactional(readOnly = true)

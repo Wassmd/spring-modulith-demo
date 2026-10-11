@@ -3,6 +3,7 @@ package com.paxier.spring_modulith_demo.customer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paxier.spring_modulith_demo.customer.model.Address;
 import com.paxier.spring_modulith_demo.customer.model.Customer;
+import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,12 +15,14 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.ZONKY;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureEmbeddedDatabase(provider = ZONKY)
 @Transactional
 class CustomerIntegrationTest {
 

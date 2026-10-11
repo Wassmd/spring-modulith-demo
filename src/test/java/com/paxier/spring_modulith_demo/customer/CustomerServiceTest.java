@@ -2,6 +2,8 @@ package com.paxier.spring_modulith_demo.customer;
 
 import com.paxier.spring_modulith_demo.customer.entity.AddressEntity;
 import com.paxier.spring_modulith_demo.customer.entity.CustomerEntity;
+import com.paxier.spring_modulith_demo.customer.mapper.CustomerMapper;
+import com.paxier.spring_modulith_demo.customer.mapper.CustomerMapperImpl;
 import com.paxier.spring_modulith_demo.customer.model.Address;
 import com.paxier.spring_modulith_demo.customer.model.Customer;
 import com.paxier.spring_modulith_demo.customer.service.CustomerService;
@@ -10,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
@@ -26,7 +29,7 @@ class CustomerServiceTest {
 
   @Mock private CustomerRepository customerRepository;
 
-  @Mock private AddressRepository addressRepository;
+  @Spy private CustomerMapper customerMapper = new CustomerMapperImpl();
 
   @InjectMocks private CustomerService customerService;
 
@@ -51,7 +54,7 @@ class CustomerServiceTest {
   void setUp() {
     testAddress =
         Address.builder().street("123 Main St").city("New York").zipCode("10001").build();
-    testCustomerEntity = CustomerEntity.builder().name("John Doe").addresses(List.of(testAddressEntity)).build();
+    testCustomerEntity = CustomerEntity.builder().id(1L).name("John Doe").addresses(List.of(testAddressEntity)).build();
   }
 
   @Test
@@ -66,7 +69,7 @@ class CustomerServiceTest {
     assertThat(result).isNotNull();
     assertThat(result.getName()).isEqualTo("John Doe");
     assertThat(result.getAddresses().getFirst().street()).isEqualTo("123 Main St");
-    verify(customerRepository, times(1)).save(testCustomerEntity);
+    verify(customerRepository, times(1)).save(any(CustomerEntity.class));
   }
 
   @Test

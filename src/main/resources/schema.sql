@@ -26,3 +26,17 @@ CREATE TABLE IF NOT EXISTS customer.address (
     references customer.customer(id)
     on delete cascade
 );
+
+-- Order aggregate (Spring Data JDBC)
+CREATE SCHEMA IF NOT EXISTS "order";
+
+CREATE TABLE IF NOT EXISTS "order"."order" (
+    id SERIAL PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS orders_line_items (
+    id SERIAL PRIMARY KEY,
+    product INTEGER NOT NULL,
+    quantity INTEGER NOT NULL,
+    "order" INTEGER REFERENCES "order"."order"(id)
+);

@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.paxier.spring_modulith_demo.customer.entity.AddressType.HOME;
 import static com.paxier.spring_modulith_demo.customer.entity.AddressType.WORK;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,6 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CustomerController.class)
+@WithMockUser
 class CustomerControllerTest {
 
   @Autowired private MockMvc mockMvc;
@@ -40,8 +42,8 @@ class CustomerControllerTest {
 
   @BeforeEach
   void setUp() {
-    Address testAddress = Address.builder().street("123 Main St").city("New York").zipCode("10001").build();
-    testCustomer = Customer.builder().id(1L).addresses(List.of(testAddress)).build() ;
+    Address testAddress = Address.builder().street("123 Main St").city("New York").zipCode("10001").type(HOME).build();
+    testCustomer = Customer.builder().id(1L).name("John Doe").addresses(List.of(testAddress)).build() ;
   }
 
   @Test
@@ -60,14 +62,13 @@ class CustomerControllerTest {
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.id").value(1))
         .andExpect(jsonPath("$.name").value("John Doe"))
-        .andExpect(jsonPath("$.address.street").value("123 Main St"))
-        .andExpect(jsonPath("$.address.city").value("New York"))
-        .andExpect(jsonPath("$.address.zipCode").value("10001"))
-        .andExpect(jsonPath("$.address.type").value("HOME"));
+        .andExpect(jsonPath("$.addresses[0].street").value("123 Main St"))
+        .andExpect(jsonPath("$.addresses[0].city").value("New York"))
+        .andExpect(jsonPath("$.addresses[0].zipCode").value("10001"))
+        .andExpect(jsonPath("$.addresses[0].type").value("HOME"));
   }
 
   @Test
-  @WithMockUser
   void shouldGetAllCustomers() throws Exception {
     // Given
     Address address2 =
@@ -92,7 +93,6 @@ class CustomerControllerTest {
   }
 
   @Test
-  @WithMockUser
   void shouldGetCustomerById() throws Exception {
     // Given
     when(customerService.getCustomerById(eq(1L))).thenReturn(testCustomer);
@@ -103,6 +103,6 @@ class CustomerControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(1))
         .andExpect(jsonPath("$.name").value("John Doe"))
-        .andExpect(jsonPath("$.address.street").value("123 Main St"));
+        .andExpect(jsonPath("$.addresses[0].street").value("123 Main St"));
   }
 }
