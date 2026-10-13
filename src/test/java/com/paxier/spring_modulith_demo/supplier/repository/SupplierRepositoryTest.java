@@ -1,5 +1,6 @@
 package com.paxier.spring_modulith_demo.supplier.repository;
 
+import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.EMBEDDED;
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.ZONKY;
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode.AFTER_EACH_TEST_METHOD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,7 +17,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @DataJpaTest
 @EnableJpaAuditing
-@AutoConfigureEmbeddedDatabase(provider = ZONKY, refresh = AFTER_EACH_TEST_METHOD)
+@AutoConfigureEmbeddedDatabase(provider = EMBEDDED, refresh = AFTER_EACH_TEST_METHOD)
 class SupplierRepositoryTest {
 
   @Autowired
