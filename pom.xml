@@ -16,12 +16,12 @@
 
     <properties>
         <java.version>25</java.version>
-        <spring-modulith.version>1.4.3</spring-modulith.version>
+        <spring-modulith.version>2.1.1</spring-modulith.version>
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
         <zonky.embedded-database-spring-test.version>2.7.1</zonky.embedded-database-spring-test.version>
         <zonky.embedded-postgres.version>2.2.0</zonky.embedded-postgres.version>
-        <springdoc-openapi-starter-webmvc-ui.version>2.8.14</springdoc-openapi-starter-webmvc-ui.version>
+        <springdoc-openapi-starter-webmvc-ui.version>3.1.1</springdoc-openapi-starter-webmvc-ui.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
     </properties>
     <dependencies>
