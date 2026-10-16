@@ -5,7 +5,7 @@ import org.springframework.modulith.core.ApplicationModules;
 import org.springframework.modulith.docs.Documenter;
 
 public class ModularityTests {
-  ApplicationModules modules = ApplicationModules.of(SpringModulithDemoApplication.class);
+  ApplicationModules modules = ApplicationModules.of(Application.class);
 
   @Test
   void verifyModularity() {

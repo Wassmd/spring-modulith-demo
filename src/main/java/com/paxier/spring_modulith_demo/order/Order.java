@@ -1,10 +1,39 @@
 package com.paxier.spring_modulith_demo.order;
 
+import static jakarta.persistence.GenerationType.IDENTITY;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 import java.util.Set;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
-@Table(value = "order", schema = "order")
-record Order(@Id Integer id, @NotEmpty(message = "line items should not be empty") Set<LineItem> lineItems) {
+@Entity
+@Table(name = "`order`", schema = "`order`")
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@Getter
+@Setter
+@Accessors(fluent = true)
+@NoArgsConstructor
+@AllArgsConstructor
+class Order {
+
+  @Id
+  @GeneratedValue(strategy = IDENTITY)
+  private Integer id;
+
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "order_id")
+  @NotEmpty(message = "line items should not be empty")
+  private Set<LineItem> lineItems;
 }

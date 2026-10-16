@@ -1,6 +1,6 @@
 package com.paxier.spring_modulith_demo.customer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.paxier.spring_modulith_demo.customer.controller.CustomerController;
 import com.paxier.spring_modulith_demo.customer.model.Address;
 import com.paxier.spring_modulith_demo.customer.model.Customer;
@@ -8,7 +8,7 @@ import com.paxier.spring_modulith_demo.customer.service.CustomerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;

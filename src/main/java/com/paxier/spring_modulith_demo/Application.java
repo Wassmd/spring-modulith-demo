@@ -6,10 +6,10 @@ import org.springframework.modulith.Modulith;
 
 @SpringBootApplication
 @Modulith
-public class SpringModulithDemoApplication {
+public class Application {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpringModulithDemoApplication.class, args);
+		SpringApplication.run(Application.class, args);
 	}
 
 }

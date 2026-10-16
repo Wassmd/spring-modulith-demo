@@ -38,5 +38,5 @@ CREATE TABLE IF NOT EXISTS orders_line_items (
     id SERIAL PRIMARY KEY,
     product INTEGER NOT NULL,
     quantity INTEGER NOT NULL,
-    "order" INTEGER REFERENCES "order"."order"(id)
+    order_id INTEGER REFERENCES "order"."order"(id)
 );

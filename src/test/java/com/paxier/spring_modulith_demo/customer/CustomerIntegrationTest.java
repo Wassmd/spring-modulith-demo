@@ -1,6 +1,6 @@
 package com.paxier.spring_modulith_demo.customer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.paxier.spring_modulith_demo.customer.model.Address;
 import com.paxier.spring_modulith_demo.customer.model.Customer;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
@@ -8,7 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
