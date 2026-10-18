@@ -6,7 +6,7 @@ This project demonstrates **Spring Modulith** - a modular monolith architecture 
 
 - **Package-based Module Separation**: Application is organized into distinct modules (`customer`, `order`, `product`)
 - **Event-Driven Communication**: Modules communicate using Spring's `ApplicationEventPublisher` 
-- **Kafka Event Externalization**: Internal events are published to Kafka topics using custom event publishers
+- **Kafka Event Externalization**: Internal events annotated with `@Externalized` are published to Kafka by Spring Modulith
 - **Event Publication Tracking**: JDBC-based event publication registry automatically creates `event_publication` table to track event status
 - **OAuth2/OIDC Authentication**: Secured with Keycloak for enterprise-grade authentication and authorization
 - **Role-Based Access Control**: Fine-grained authorization using Keycloak realm and client roles
@@ -19,12 +19,14 @@ This project demonstrates **Spring Modulith** - a modular monolith architecture 
 ```
 spring-modulith-demo/
 ├── src/main/java/com/paxier/spring_modulith_demo/
-│   ├── SpringModulithDemoApplication.java
+│   ├── Application.java
+│   ├── config/            # JPA and security configuration
 │   ├── customer/          # Customer module (JPA)
-│   │   ├── Address.java
-│   │   ├── Customer.java
-│   │   ├── CustomerController.java
-│   │   ├── CustomerService.java
+│   │   ├── controller/    # CustomerController
+│   │   ├── entity/        # CustomerEntity, AddressEntity, AddressType
+│   │   ├── mapper/        # CustomerMapper
+│   │   ├── model/         # Customer, Address
+│   │   ├── service/       # CustomerService
 │   │   ├── CustomerRepository.java
 │   │   ├── AddressRepository.java
 │   │   └── package-info.java
@@ -34,12 +36,12 @@ spring-modulith-demo/
 │   │   ├── OrderController.java
 │   │   ├── OrderPlaceEvent.java # Externalized event for kafka
 │   │   ├── OrderRepository.java
-│   │   └── LineItem.java
+│   │   ├── LineItem.java
 │   │   └── package-info.java
-|   |
-│   └── product/           # Product module
-│       └── ProductsService.java
-│   │   └── package-info.java
+│   ├── payment/           # Payment module
+│   ├── product/           # Product module (JPA)
+│   ├── shared/            # Shared entity infrastructure
+│   └── supplier/          # Supplier module (JPA)
 └── src/test/java/
     ├── ModularityTests.java   # Module structure verification
     └── customer/
@@ -58,18 +60,18 @@ spring-modulith-demo/
 
 #### 1. Customer Module (JPA-based)
 - **Technology**: Spring Data JPA with separate tables
-- **Entities**: `Customer` (customers table) and `Address` (addresses table)
-- **Relationship**: OneToOne with cascade operations
+- **Entities**: `CustomerEntity` (`customer.customer` table) and `AddressEntity` (`customer.address` table)
+- **Relationship**: OneToMany from customer to addresses, with cascading and orphan removal
 - **Endpoints**:
   - `POST /customers` - Create customer with address
   - `GET /customers` - Get all customers
   - `GET /customers/{id}` - Get customer by ID
-- **Testing**: Full integration tests with H2 database
+- **Testing**: Integration and repository tests with Zonky Embedded PostgreSQL
 
-#### 2. Order Module (Spring Data JDBC)
-- **Technology**: Spring Data JDBC with event externalization
+#### 2. Order Module (Spring Data JPA)
+- **Technology**: Spring Data JPA for orders and line items
 - **Communication**: Publishes `OrderPlaceEvent` to Kafka
-- **Event Tracking**: Uses `event_publication` table
+- **Event Tracking**: Spring Modulith uses JDBC for its `event_publication` table, independently of JPA entity persistence
 
 #### 3. Product Module
 - **Service Layer**: Business logic for products
@@ -105,8 +107,8 @@ This enables:
 
 ### Prerequisites
 
-- Java 21
-- Maven 3.6+
+- Java 25
+- Maven Wrapper (`./mvnw`)
 - Docker & Docker Compose
 
 ### Running the Application
@@ -136,9 +138,13 @@ This enables:
    - Create user: `testuser` / `password`
    - Assign roles: `user`, `admin`
 
+   The checked-in `application.yml` currently points to the `master` realm.
+   If you create the `spring-modulith` realm as described here, update both
+   `issuer-uri` and `jwk-set-uri` to match it before running the application.
+
 3. **Run the Application**:
    ```bash
-   mvn spring-boot:run
+   ./mvnw spring-boot:run
    ```
 
    The application will:
@@ -164,36 +170,36 @@ This enables:
      -H "Authorization: Bearer $TOKEN" \
      -H "Content-Type: application/json" \
      -d '{
-       "orderId": 1,
        "lineItems": [
-         {"id": 1, "product": 101, "quantity": 2}
+         {"product": 101, "quantity": 2}
        ]
      }'
    ```
 
-6. **Create a Customer with Address** (Protected Endpoint):
+6. **Create a Customer with Addresses** (Requires the `admin` Role):
    ```bash
    curl -X POST http://localhost:8080/customers \
      -H "Authorization: Bearer $TOKEN" \
      -H "Content-Type: application/json" \
      -d '{
        "name": "John Doe",
-       "address": {
+       "addresses": [{
          "street": "123 Main Street",
          "city": "New York",
-         "zipCode": "10001"
-       }
+         "zipCode": "10001",
+         "type": "HOME"
+       }]
      }'
    ```
    
-   This demonstrates **JPA's OneToOne relationship** - Customer and Address are saved in separate tables but linked via foreign key.
+   This demonstrates **JPA's OneToMany relationship**: a customer can have multiple addresses linked through the `customer_id` foreign key.
 
-5. **Get All Customers**:
+7. **Get All Customers** (Protected Endpoint):
    ```bash
-   curl http://localhost:8080/customers
+   curl -H "Authorization: Bearer $TOKEN" http://localhost:8080/customers
    ```
 
-6. **Verify Kafka Message**:
+8. **Verify Kafka Message**:
    ```bash
    # Enter Kafka container
    docker exec -it <kafka-container-id> bash
@@ -240,6 +246,10 @@ After running tests, check `target/spring-modulith-docs/`:
 ## ⚙️ Configuration
 
 ### application.yml
+
+The following example assumes the `spring-modulith` realm from the setup guide.
+The checked-in configuration currently uses `master`; both JWT URLs must match
+the realm issuing your tokens.
 
 ```yaml
 spring:
@@ -374,15 +384,16 @@ docker exec -it <kafka-container-id> kafka-console-consumer \
 
 ## 🛠️ Technology Stack
 
-- **Spring Boot 3.5.7**
-- **Spring Modulith 1.4.3**
-- **Spring Security 6.x** with OAuth2 Resource Server
-- **Keycloak 26.0.7** for Authentication & Authorization
-- **Spring Data JDBC** & **Spring Data JPA**
+- **Spring Boot 4.1.1**
+- **Spring Modulith 2.1.1**
+- **Spring Security 7.x** with OAuth2 Resource Server
+- **Keycloak 23.0** for Authentication & Authorization (Docker Compose image)
+- **Spring Data JPA** for domain persistence
+- **Spring Modulith JDBC Event Publication Registry**
 - **Spring Kafka**
 - **PostgreSQL**
-- **Apache Kafka 7.6.1**
-- **Java 21**
+- **Apache Kafka** via the **Confluent Platform 7.6.1** Docker images
+- **Java 25**
 
 ## 📖 References
 
