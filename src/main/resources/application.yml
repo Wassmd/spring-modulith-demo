@@ -13,15 +13,12 @@ spring:
   docker:
     compose:
       lifecycle-management: start_only
-  sql:
-    init:
-      mode: always
   modulith:
     events:
       republish-outstanding-events-on-restart: true
       jdbc:
         schema-initialization:
-          enabled: true
+          enabled: false  # event_publication is created by Flyway
   datasource:
     url: jdbc:postgresql://localhost:5432/mydatabase
     username: myuser
@@ -29,7 +26,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
@@ -60,6 +57,5 @@ springdoc:
     groups-order: desc
 logging:
   level:
-    org.springframework.jdbc.datasource.init: DEBUG
-    org.springframework.boot.sql.init: DEBUG
+    org.flywaydb: INFO
 

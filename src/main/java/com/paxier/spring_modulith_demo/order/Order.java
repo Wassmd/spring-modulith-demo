@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.Valid;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +20,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Entity
-@Table(name = "`order`", schema = "`order`")
+@Table(name = "orders", schema = "orders")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @Getter
 @Setter
@@ -33,7 +34,8 @@ class Order {
   private Integer id;
 
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-  @JoinColumn(name = "order_id")
+  @JoinColumn(name = "order_id", nullable = false)
   @NotEmpty(message = "line items should not be empty")
+  @Valid
   private Set<LineItem> lineItems;
 }

@@ -1,15 +1,15 @@
 POST http://localhost:8080/orders
 Content-Type: application/json
-Authorization: Bearer {{auth_token}}
+#Authorization: Bearer {{auth_token}}
 
 {
   "lineItems": [
     {
-      "product": 1,
+      "productId": 1,
       "quantity": 1
     },
     {
-      "product": 12,
+      "productId": 12,
       "quantity": 200
     }
   ]

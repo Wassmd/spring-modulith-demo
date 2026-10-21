@@ -1,20 +1,28 @@
 package com.paxier.spring_modulith_demo.order;
 
+import com.paxier.spring_modulith_demo.payment.service.PaymentService;
+import com.paxier.spring_modulith_demo.payment.service.PaymentStatus;
+import com.paxier.spring_modulith_demo.inventory.InventoryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 
 import java.util.Set;
 
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.ZONKY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@SpringBootTest(properties = "spring.modulith.events.externalization.enabled=false")
 @RecordApplicationEvents
 @Transactional
 @AutoConfigureEmbeddedDatabase(provider = ZONKY)
@@ -29,10 +37,22 @@ class OrderServiceIntegrationTest {
   @Autowired
   private ApplicationEvents applicationEvents;
 
+  @Autowired
+  private JdbcTemplate jdbcTemplate;
+
+  @MockitoBean
+  private PaymentService paymentService;
+
+  @Autowired
+  private InventoryService inventoryService;
+
   @BeforeEach
   void setUp() {
     // Clean up before each test
     orderRepository.deleteAll();
+    inventoryService.addStock(100, 100);
+    inventoryService.addStock(200, 100);
+    inventoryService.addStock(300, 100);
   }
 
   @Test
@@ -140,5 +160,40 @@ class OrderServiceIntegrationTest {
     assertThat(savedOrder2.id()).isNotNull();
     assertThat(savedOrder1.id()).isNotEqualTo(savedOrder2.id());
   }
-}
 
+  @Test
+  @Transactional(propagation = Propagation.NOT_SUPPORTED)
+  void shouldCommitOrderAndEventPublicationWithoutTestTransaction() {
+    Order order = new Order(null, Set.of(new LineItem(null, 100, 2)));
+    when(paymentService.processPayment(100.0)).thenReturn(PaymentStatus.SUCCESS);
+
+    orderService.place(order);
+
+    assertThat(orderRepository.existsById(order.id())).isTrue();
+    assertThat(eventPublicationCount(order.id())).isPositive();
+  }
+
+  @Test
+  @Transactional(propagation = Propagation.NOT_SUPPORTED)
+  void shouldRollBackOrderAndEventPublicationWhenPaymentFails() {
+    Order order = new Order(null, Set.of(new LineItem(null, 100, 2)));
+    IllegalStateException failure = new IllegalStateException("Payment unavailable");
+    when(paymentService.processPayment(100.0)).thenAnswer(invocation -> {
+      assertThat(orderRepository.existsById(order.id())).isTrue();
+      assertThat(eventPublicationCount(order.id())).isPositive();
+      throw failure;
+    });
+
+    assertThatThrownBy(() -> orderService.place(order)).isSameAs(failure);
+
+    assertThat(orderRepository.existsById(order.id())).isFalse();
+    assertThat(eventPublicationCount(order.id())).isZero();
+  }
+
+  private Long eventPublicationCount(Integer orderId) {
+    return jdbcTemplate.queryForObject("""
+        SELECT count(*) FROM event_publication
+        WHERE event_type = ? AND CAST(serialized_event AS jsonb) ->> 'orderId' = ?
+        """, Long.class, OrderPlaceEvent.class.getName(), orderId.toString());
+  }
+}

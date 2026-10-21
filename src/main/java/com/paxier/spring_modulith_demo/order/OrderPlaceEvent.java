@@ -3,6 +3,12 @@ import java.util.Set;
 import org.springframework.modulith.events.Externalized;
 
 @Externalized("order-created")
-public record OrderPlaceEvent(int orderId, Set<LineItem> lineItems)  {
-}
+public record OrderPlaceEvent(int orderId, Set<Item> lineItems) {
 
+  public OrderPlaceEvent {
+    lineItems = Set.copyOf(lineItems);
+  }
+
+  public record Item(Integer id, int productId, int quantity) {
+  }
+}
