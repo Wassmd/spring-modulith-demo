@@ -50,6 +50,8 @@ spring-modulith-demo/
 │   └── supplier/          # Supplier module (JPA)
 └── src/test/java/
     ├── ModularityTests.java   # Module structure verification
+    ├── notification/
+    │   └── NotificationModuleTest.java  # @ApplicationModuleTest + Scenario
     └── customer/
         ├── CustomerIntegrationTest.java
         ├── CustomerServiceTest.java
@@ -304,14 +306,15 @@ The `ModularityTests` class:
 
 ### Inventory and Notification Workflow Tests
 
-Run the architecture, Order regression, workflow and notification recovery tests
+Run the architecture, Order regression, workflow, notification module and
+notification recovery tests
 without starting Docker Compose or connecting to Kafka:
 
 ```bash
 ./mvnw \
   -Dspring.docker.compose.enabled=false \
   -Dspring.modulith.events.externalization.enabled=false \
-  -Dtest=ModularityTests,OrderServiceTests,OrderControllerTests,OrderServiceIntegrationTest,OrderWorkflowIntegrationTest,NotificationRecoveryIntegrationTest \
+  -Dtest=ModularityTests,OrderServiceTests,OrderControllerTests,OrderServiceIntegrationTest,OrderWorkflowIntegrationTest,NotificationModuleTest,NotificationRecoveryIntegrationTest \
   test
 ```
 

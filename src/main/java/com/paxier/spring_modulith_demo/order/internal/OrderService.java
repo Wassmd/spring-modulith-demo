@@ -7,6 +7,7 @@ import static java.util.stream.Collectors.toSet;
 import com.paxier.spring_modulith_demo.inventory.InventoryItem;
 import com.paxier.spring_modulith_demo.inventory.InventoryService;
 import com.paxier.spring_modulith_demo.payment.service.PaymentService;
+import com.paxier.spring_modulith_demo.payment.model.PaymentStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -38,5 +39,6 @@ class OrderService {
         .collect(toSet())));
 
     log.info("Order placed: {}, payment: {}", saved.id(), paymentService.processPayment(100.0));
+//    log.info("Order status: {}", PaymentStatus.SUCCESS);
   }
 }

@@ -15,7 +15,7 @@ import com.paxier.spring_modulith_demo.inventory.InsufficientStockException;
 import com.paxier.spring_modulith_demo.inventory.InventoryItem;
 import com.paxier.spring_modulith_demo.inventory.InventoryService;
 import com.paxier.spring_modulith_demo.payment.service.PaymentService;
-import com.paxier.spring_modulith_demo.payment.service.PaymentStatus;
+import com.paxier.spring_modulith_demo.payment.model.PaymentStatus;
 import java.util.Set;
 import java.util.List;
 import org.junit.jupiter.api.Test;

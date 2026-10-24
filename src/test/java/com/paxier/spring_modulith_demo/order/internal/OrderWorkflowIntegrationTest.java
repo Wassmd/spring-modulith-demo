@@ -17,7 +17,7 @@ import com.paxier.spring_modulith_demo.inventory.InventoryItem;
 import com.paxier.spring_modulith_demo.inventory.InventoryService;
 import com.paxier.spring_modulith_demo.notification.NotificationService;
 import com.paxier.spring_modulith_demo.payment.service.PaymentService;
-import com.paxier.spring_modulith_demo.payment.service.PaymentStatus;
+import com.paxier.spring_modulith_demo.payment.model.PaymentStatus;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import java.time.Duration;
 import java.util.List;

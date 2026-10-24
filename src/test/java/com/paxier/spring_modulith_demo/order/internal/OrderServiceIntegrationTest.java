@@ -3,7 +3,7 @@ package com.paxier.spring_modulith_demo.order.internal;
 import com.paxier.spring_modulith_demo.order.OrderPlaceEvent;
 
 import com.paxier.spring_modulith_demo.payment.service.PaymentService;
-import com.paxier.spring_modulith_demo.payment.service.PaymentStatus;
+import com.paxier.spring_modulith_demo.payment.model.PaymentStatus;
 import com.paxier.spring_modulith_demo.inventory.InventoryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

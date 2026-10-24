@@ -1,8 +1,9 @@
 package com.paxier.spring_modulith_demo.payment.service;
 
-import static com.paxier.spring_modulith_demo.payment.service.PaymentStatus.PENDING;
-import static com.paxier.spring_modulith_demo.payment.service.PaymentStatus.SUCCESS;
+import static com.paxier.spring_modulith_demo.payment.model.PaymentStatus.PENDING;
+import static com.paxier.spring_modulith_demo.payment.model.PaymentStatus.SUCCESS;
 
+import com.paxier.spring_modulith_demo.payment.model.PaymentStatus;
 import org.springframework.stereotype.Service;
 
 @Service
