@@ -18,7 +18,7 @@ class OrderController {
   private final OrderService orderService;
 
   @PostMapping
-  void place(@Valid @RequestBody Order order, Customer customer) {
+  void place(@Valid @RequestBody Order order) {
     orderService.place(order);
   }
 }
