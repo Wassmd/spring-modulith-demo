@@ -32,14 +32,10 @@ spring-modulith-demo/
 │   │   ├── CustomerRepository.java
 │   │   ├── AddressRepository.java
 │   │   └── package-info.java
-│   ├── order/             # Order module
-│   │   ├── Order.java
-│   │   ├── OrderService.java
-│   │   ├── OrderController.java
+│   ├── order/             # Order module – public API: the event only
 │   │   ├── OrderPlaceEvent.java # Externalized event for kafka
-│   │   ├── OrderRepository.java
-│   │   ├── LineItem.java
-│   │   └── package-info.java
+│   │   ├── package-info.java
+│   │   └── internal/     # Entities, repository, service and REST controller
 │   ├── payment/           # Payment module
 │   ├── inventory/         # Public stock API
 │   │   ├── InventoryService.java

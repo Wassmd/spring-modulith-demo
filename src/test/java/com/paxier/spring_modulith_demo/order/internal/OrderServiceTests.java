@@ -1,4 +1,6 @@
-package com.paxier.spring_modulith_demo.order;
+package com.paxier.spring_modulith_demo.order.internal;
+
+import com.paxier.spring_modulith_demo.order.OrderPlaceEvent;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;

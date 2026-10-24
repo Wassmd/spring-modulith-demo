@@ -13,7 +13,7 @@ class OrderPlacedListener {
 
   private final NotificationRepository notifications;
 
-  @ApplicationModuleListener
+  @ApplicationModuleListener // @Async + @Transactional(REQUIRES_NEW) + @TransactionalEventListener
   void on(OrderPlaceEvent event) {
     notifications.enqueue(event.orderId());
     log.info("Notification queued for order {}", event.orderId());

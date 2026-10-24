@@ -1,4 +1,4 @@
-package com.paxier.spring_modulith_demo.order;
+package com.paxier.spring_modulith_demo.order.internal;
 
 import tools.jackson.databind.ObjectMapper;
 import com.paxier.spring_modulith_demo.config.SecurityConfig;

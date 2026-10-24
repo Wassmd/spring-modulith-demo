@@ -1,4 +1,4 @@
-package com.paxier.spring_modulith_demo.order;
+package com.paxier.spring_modulith_demo.order.internal;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
