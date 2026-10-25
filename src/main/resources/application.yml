@@ -14,6 +14,8 @@ spring:
     compose:
       lifecycle-management: start_only
   modulith:
+    runtime:
+      verification-enabled: true  # verify module structure on startup; fails fast on violations
     events:
       republish-outstanding-events-on-restart: true
       jdbc:

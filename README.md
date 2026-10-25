@@ -51,7 +51,9 @@ spring-modulith-demo/
 └── src/test/java/
     ├── ModularityTests.java   # Module structure verification
     ├── notification/
-    │   └── NotificationModuleTest.java  # @ApplicationModuleTest + Scenario
+    │   ├── NotificationModuleTest.java      # @ApplicationModuleTest + Scenario
+    │   └── internal/
+    │       └── OrderPlacedListenerTest.java # Plain unit test with Mockito
     └── customer/
         ├── CustomerIntegrationTest.java
         ├── CustomerServiceTest.java
@@ -304,6 +306,10 @@ The `ModularityTests` class:
 - **Generates documentation**: Creates PlantUML diagrams in `target/spring-modulith-docs/`
 - **Validates structure**: Fails if modules violate architectural rules
 
+The same check also runs once on application startup
+(`spring.modulith.runtime.verification-enabled: true`): a violation stops the
+application from starting. It does not guard calls, SQL or reflection at runtime.
+
 ### Inventory and Notification Workflow Tests
 
 Run the architecture, Order regression, workflow, notification module and
@@ -314,7 +320,7 @@ without starting Docker Compose or connecting to Kafka:
 ./mvnw \
   -Dspring.docker.compose.enabled=false \
   -Dspring.modulith.events.externalization.enabled=false \
-  -Dtest=ModularityTests,OrderServiceTests,OrderControllerTests,OrderServiceIntegrationTest,OrderWorkflowIntegrationTest,NotificationModuleTest,NotificationRecoveryIntegrationTest \
+  -Dtest=ModularityTests,OrderServiceTests,OrderControllerTests,OrderServiceIntegrationTest,OrderWorkflowIntegrationTest,OrderPlacedListenerTest,NotificationModuleTest,NotificationRecoveryIntegrationTest \
   test
 ```
 
@@ -347,6 +353,8 @@ the realm issuing your tokens.
 ```yaml
 spring:
   modulith:
+    runtime:
+      verification-enabled: true  # Verify module structure on startup (fail fast)
     events:
       republish-outstanding-events-on-restart: true  # Retry failed events
       jdbc:
