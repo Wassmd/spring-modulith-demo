@@ -1,12 +1,12 @@
 package com.paxier.spring_modulith_demo.notification.internal;
 
-import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.ZONKY;
+import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.EMBEDDED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doThrow;
 
-import com.paxier.spring_modulith_demo.order.OrderPlaceEvent;
+import com.paxier.spring_modulith_demo.order.OrderPlacedEvent;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import java.time.Duration;
 import java.util.Set;
@@ -24,7 +24,7 @@ import org.springframework.transaction.support.TransactionTemplate;
     "spring.docker.compose.enabled=false",
     "spring.modulith.events.externalization.enabled=false"
 })
-@AutoConfigureEmbeddedDatabase(provider = ZONKY)
+@AutoConfigureEmbeddedDatabase(provider = EMBEDDED)
 class NotificationRecoveryIntegrationTest {
 
   @Autowired ApplicationEventPublisher events;
@@ -38,7 +38,7 @@ class NotificationRecoveryIntegrationTest {
     int orderId = 901;
     doThrow(new DataAccessResourceFailureException("Simulated notification database failure"))
         .when(notifications).enqueue(orderId);
-    var event = new OrderPlaceEvent(orderId, Set.of(new OrderPlaceEvent.Item(1, 101, 2)));
+    var event = new OrderPlacedEvent(orderId, Set.of(new OrderPlacedEvent.Item(1, 101, 2)));
 
     transactions.executeWithoutResult(status -> events.publishEvent(event));
 
@@ -52,7 +52,7 @@ class NotificationRecoveryIntegrationTest {
 
     doCallRealMethod().when(notifications).enqueue(orderId);
     publications.resubmitIncompletePublications(publication ->
-        publication.getEvent() instanceof OrderPlaceEvent placed && placed.orderId() == orderId);
+        publication.getEvent() instanceof OrderPlacedEvent placed && placed.orderId() == orderId);
 
     await().atMost(Duration.ofSeconds(15)).untilAsserted(() -> {
       assertThat(notifications.findByOrderId(orderId)).isPresent();

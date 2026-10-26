@@ -1,6 +1,6 @@
 package com.paxier.spring_modulith_demo.order.internal;
 
-import com.paxier.spring_modulith_demo.order.OrderPlaceEvent;
+import com.paxier.spring_modulith_demo.order.OrderPlacedEvent;
 
 import com.paxier.spring_modulith_demo.payment.service.PaymentService;
 import com.paxier.spring_modulith_demo.payment.model.PaymentStatus;
@@ -76,7 +76,7 @@ class OrderServiceIntegrationTest {
   }
 
   @Test
-  void shouldPublishOrderPlaceEventAfterSavingOrder() {
+  void shouldPublishOrderPlacedEventAfterSavingOrder() {
     // Given
     LineItem lineItem = new LineItem(null, 100, 5);
     Order order = new Order(null, Set.of(lineItem));
@@ -85,10 +85,10 @@ class OrderServiceIntegrationTest {
     orderService.place(order);
 
     // Then - Verify event was published
-    long eventCount = applicationEvents.stream(OrderPlaceEvent.class).count();
+    long eventCount = applicationEvents.stream(OrderPlacedEvent.class).count();
     assertThat(eventCount).isEqualTo(1);
 
-    OrderPlaceEvent publishedEvent = applicationEvents.stream(OrderPlaceEvent.class)
+    OrderPlacedEvent publishedEvent = applicationEvents.stream(OrderPlacedEvent.class)
         .findFirst()
         .orElseThrow();
 
@@ -113,7 +113,7 @@ class OrderServiceIntegrationTest {
     assertThat(orders).hasSize(3);
 
     // Verify events were published for all orders
-    long eventCount = applicationEvents.stream(OrderPlaceEvent.class).count();
+    long eventCount = applicationEvents.stream(OrderPlacedEvent.class).count();
     assertThat(eventCount).isEqualTo(3);
   }
 
@@ -134,7 +134,7 @@ class OrderServiceIntegrationTest {
     assertThat(savedOrder.lineItems()).hasSize(3);
 
     // Verify the event contains all line items
-    OrderPlaceEvent publishedEvent = applicationEvents.stream(OrderPlaceEvent.class)
+    OrderPlacedEvent publishedEvent = applicationEvents.stream(OrderPlacedEvent.class)
         .findFirst()
         .orElseThrow();
     assertThat(publishedEvent.lineItems()).hasSize(3);
@@ -196,6 +196,6 @@ class OrderServiceIntegrationTest {
     return jdbcTemplate.queryForObject("""
         SELECT count(*) FROM event_publication
         WHERE event_type = ? AND CAST(serialized_event AS jsonb) ->> 'orderId' = ?
-        """, Long.class, OrderPlaceEvent.class.getName(), orderId.toString());
+        """, Long.class, OrderPlacedEvent.class.getName(), orderId.toString());
   }
 }

@@ -28,7 +28,7 @@ spring-modulith-demo/
 │   │   ├── package-info.java
 │   │   └── internal/     # Controller, entities, repositories and mapper
 │   ├── order/             # Order module – public API: the event only
-│   │   ├── OrderPlaceEvent.java # Externalized event for kafka
+│   │   ├── OrderPlacedEvent.java # Externalized event for kafka
 │   │   ├── package-info.java
 │   │   └── internal/     # Entities, repository, service and REST controller
 │   ├── payment/           # Payment module
@@ -79,7 +79,7 @@ spring-modulith-demo/
 
 #### 2. Order Module (Spring Data JPA)
 - **Technology**: Spring Data JPA for orders and line items
-- **Communication**: Publishes `OrderPlaceEvent` to Kafka
+- **Communication**: Publishes `OrderPlacedEvent` to Kafka
 - **Event Tracking**: Spring Modulith uses JDBC for its `event_publication` table, independently of JPA entity persistence
 
 #### 3. Product Module
@@ -94,7 +94,7 @@ spring-modulith-demo/
 - **Scope**: Kept intentionally simple: no reservation history, cancellation or idempotency. Products are referenced by ID only.
 
 #### 5. Notification Module
-- **Integration**: `@ApplicationModuleListener` consumes `OrderPlaceEvent` asynchronously after a successful commit, in its own transaction. Async processing is enabled on `Application`.
+- **Integration**: `@ApplicationModuleListener` consumes `OrderPlacedEvent` asynchronously after a successful commit, in its own transaction. Async processing is enabled on `Application`.
 - **Persistence**: Owns `notification.delivery`; `(order_id, kind)` is the primary key, so retries cannot create a second order confirmation job.
 - **Endpoint**: `GET /notifications/orders/{orderId}` returns a queued notification or HTTP 404 if it is not yet available.
 - **Scope**: This demo queues jobs with status `PENDING`. It does **not** send email or run a delivery worker. The registry marks successful queueing, not successful external delivery.
@@ -104,9 +104,9 @@ spring-modulith-demo/
 
 1. **Order Creation**: `OrderController` receives HTTP POST request
 2. **Synchronous Reservation**: `OrderService` saves the order and calls `InventoryService.reserve`. Missing or insufficient stock raises HTTP 409 and rolls back the transaction.
-3. **Internal Event**: `OrderService` publishes `OrderPlaceEvent` using `ApplicationEventPublisher`. The event contains immutable item snapshots rather than JPA entities, retaining the JSON fields `id`, `productId` and `quantity`.
+3. **Internal Event**: `OrderService` publishes `OrderPlacedEvent` using `ApplicationEventPublisher`. The event contains immutable item snapshots rather than JPA entities, retaining the JSON fields `id`, `productId` and `quantity`.
 4. **Commit**: The existing demo payment call remains inside the transaction. A thrown payment error rolls back the order, stock changes and event publications.
-5. **Asynchronous Reactions**: After commit, Notification queues a delivery job. Existing Product handling and Kafka externalization remain in place.
+5. **Asynchronous Reactions**: After commit, Notification queues a delivery job; Kafka externalization publishes the event to `order-created`.
 6. **Event Tracking**: Spring Modulith JDBC records publications per transactional listener in `event_publication`. Notification can lag behind order creation and must be queried separately.
 
 Inventory does not depend on Order. Order depends on Inventory's public API, and Notification depends on Order's public event. Both new modules keep repositories and controllers in internal packages. Flyway migrations create separate schemas in the same PostgreSQL database; schemas document ownership but are not access-control barriers when using one database user.
@@ -440,11 +440,11 @@ Modules use **public APIs** when an immediate transactional result is required
 and **Spring Application Events** for decoupled reactions:
 ```java
 // Publishing module
-publisher.publishEvent(new OrderPlaceEvent(orderId, itemSnapshots));
+publisher.publishEvent(new OrderPlacedEvent(orderId, itemSnapshots));
 
 // Subscribing module
 @ApplicationModuleListener
-void onOrderPlaced(OrderPlaceEvent event) {
+void onOrderPlaced(OrderPlacedEvent event) {
     // Handle event
 }
 ```

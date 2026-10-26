@@ -1,6 +1,6 @@
 package com.paxier.spring_modulith_demo.order.internal;
 
-import com.paxier.spring_modulith_demo.order.OrderPlaceEvent;
+import com.paxier.spring_modulith_demo.order.OrderPlacedEvent;
 
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.ZONKY;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -144,7 +144,7 @@ class OrderWorkflowIntegrationTest {
 
   @Test
   void shouldDeduplicateReplayedNotifications() {
-    var event = new OrderPlaceEvent(600, Set.of(new OrderPlaceEvent.Item(1, 101, 2)));
+    var event = new OrderPlacedEvent(600, Set.of(new OrderPlacedEvent.Item(1, 101, 2)));
     transactions.executeWithoutResult(status -> events.publishEvent(event));
     awaitNotification(600);
     transactions.executeWithoutResult(status -> events.publishEvent(event));

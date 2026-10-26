@@ -1,6 +1,6 @@
 package com.paxier.spring_modulith_demo.order.internal;
 
-import com.paxier.spring_modulith_demo.order.OrderPlaceEvent;
+import com.paxier.spring_modulith_demo.order.OrderPlacedEvent;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -56,9 +56,9 @@ public class OrderServiceTests {
     //then
     verify(orderRepository, times(1)).save(order);
     verify(inventoryService).reserve(List.of(new InventoryItem(2, 3)));
-    ArgumentCaptor<OrderPlaceEvent> event = ArgumentCaptor.forClass(OrderPlaceEvent.class);
+    ArgumentCaptor<OrderPlacedEvent> event = ArgumentCaptor.forClass(OrderPlacedEvent.class);
     verify(applicationEventPublisher).publishEvent(event.capture());
-    assertThat(event.getValue().lineItems()).containsExactly(new OrderPlaceEvent.Item(1, 2, 3));
+    assertThat(event.getValue().lineItems()).containsExactly(new OrderPlacedEvent.Item(1, 2, 3));
     order.lineItems().iterator().next().quantity(99);
     assertThat(event.getValue().lineItems().iterator().next().quantity()).isEqualTo(3);
   }
@@ -72,7 +72,7 @@ public class OrderServiceTests {
 
     assertThatThrownBy(() -> orderService.place(order)).isInstanceOf(InsufficientStockException.class);
 
-    verify(applicationEventPublisher, never()).publishEvent(any(OrderPlaceEvent.class));
+    verify(applicationEventPublisher, never()).publishEvent(any(OrderPlacedEvent.class));
     verify(paymentService, never()).processPayment(any(Double.class));
   }
 }

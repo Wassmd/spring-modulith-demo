@@ -1,10 +1,9 @@
 package com.paxier.spring_modulith_demo.notification;
 
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.EMBEDDED;
-import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.ZONKY;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.paxier.spring_modulith_demo.order.OrderPlaceEvent;
+import com.paxier.spring_modulith_demo.order.OrderPlacedEvent;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -25,7 +24,7 @@ class NotificationModuleTest {
 
   @Test
   void queuesNotificationWhenOrderIsPlaced(Scenario scenario) {
-    var event = new OrderPlaceEvent(951, Set.of(new OrderPlaceEvent.Item(1, 101, 2)));
+    var event = new OrderPlacedEvent(951, Set.of(new OrderPlacedEvent.Item(1, 101, 2)));
 
     scenario.publish(event)
         .andWaitForStateChange(() -> notifications.findByOrderId(951))
