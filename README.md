@@ -40,11 +40,10 @@ spring-modulith-demo/
 │   │   ├── Notification.java
 │   │   └── internal/     # Async order listener, delivery repository and REST controller
 │   ├── product/           # Product module (JPA) – public API: ProductService, Product
-│   │   ├── entity/       # ProductEntity – still exposed as named interface "entity" for Supplier
-│   │   └── internal/     # Controller, repository, mapper and order event listener
+│   │   └── internal/     # Entity, controller, repository, mapper and order event listener
 │   ├── shared/            # Shared entity infrastructure
 │   └── supplier/          # Supplier module (JPA) – public API: SupplierService, Supplier
-│       └── internal/     # Entity, repository and mapper
+│       └── internal/     # Entity (references products by ID only), repository and mapper
 └── src/test/java/
     ├── ModularityTests.java   # Module structure verification
     ├── notification/
@@ -120,12 +119,16 @@ in its own folder under `src/main/resources/db/migration`:
 db/migration/
   customer/      V1_1__customer_schema.sql
   product/       V1_2__product_schema.sql
-  supplier/      V1_3__supplier_schema.sql   (FK to product, so it runs after it)
+  supplier/      V1_3__supplier_schema.sql   (originally with FK to product)
+                 V1_8__drop_product_foreign_key.sql
   order/         V1_4__order_schema.sql
   inventory/     V1_5__inventory_schema.sql
   notification/  V1_6__notification_schema.sql
   modulith/      V1_7__event_publication.sql
 ```
+
+`V1_8` removes the cross-schema foreign key: Supplier stores only the product ID,
+so neither the JPA mapping nor the database couples Supplier to Product's table.
 
 Flyway scans the subfolders automatically, but version numbers are global:
 every new migration needs a unique version across all modules.

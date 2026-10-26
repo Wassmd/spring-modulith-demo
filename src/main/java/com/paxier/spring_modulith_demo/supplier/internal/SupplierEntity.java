@@ -1,16 +1,12 @@
 package com.paxier.spring_modulith_demo.supplier.internal;
 
-import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
-import com.paxier.spring_modulith_demo.product.entity.ProductEntity;
 import com.paxier.spring_modulith_demo.shared.entity.AuditedEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,7 +29,7 @@ public class SupplierEntity extends AuditedEntity {
 
   private String supplierName;
 
-  @ManyToOne(fetch = LAZY)
-  @JoinColumn(name = "product_Id")
-  private ProductEntity productEntity;
+  // Product is referenced by ID only; the entity stays inside the Product module.
+  @Column(name = "product_id")
+  private Long productId;
 }

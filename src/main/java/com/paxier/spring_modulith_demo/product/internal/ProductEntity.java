@@ -1,4 +1,4 @@
-package com.paxier.spring_modulith_demo.product.entity;
+package com.paxier.spring_modulith_demo.product.internal;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 

@@ -15,7 +15,7 @@ public class SupplierService {
 
   @Transactional(readOnly = true)
   public List<Supplier> getSuppliersForProduct(long productId) {
-    return supplierRepository.findByProductEntity_ProductId(productId).stream()
+    return supplierRepository.findByProductId(productId).stream()
         .map(supplierMapper::toDomain)
         .toList();
   }

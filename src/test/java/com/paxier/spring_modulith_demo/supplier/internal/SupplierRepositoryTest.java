@@ -1,11 +1,9 @@
 package com.paxier.spring_modulith_demo.supplier.internal;
 
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.EMBEDDED;
-import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.ZONKY;
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode.AFTER_EACH_TEST_METHOD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.paxier.spring_modulith_demo.product.entity.ProductEntity;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -27,23 +25,21 @@ class SupplierRepositoryTest {
 
   @Test
   void findSuppliersByProductId() {
-    ProductEntity product = ProductEntity.builder()
-        .name("Test Product")
-        .price(9.99)
-        .build();
-    entityManager.persist(product);
-
-    SupplierEntity supplier = SupplierEntity.builder()
+    long productId = 42L;
+    entityManager.persist(SupplierEntity.builder()
         .supplierName("Test Supplier")
-        .productEntity(product)
-        .build();
-    entityManager.persist(supplier);
+        .productId(productId)
+        .build());
+    entityManager.persist(SupplierEntity.builder()
+        .supplierName("Other Supplier")
+        .productId(7L)
+        .build());
     entityManager.flush();
 
-    List<SupplierEntity> suppliers = repository.findByProductEntity_ProductId(product.getProductId());
+    List<SupplierEntity> suppliers = repository.findByProductId(productId);
 
     assertEquals(1, suppliers.size());
     assertEquals("Test Supplier", suppliers.getFirst().getSupplierName());
-    assertEquals(product.getProductId(), suppliers.getFirst().getProductEntity().getProductId());
+    assertEquals(productId, suppliers.getFirst().getProductId());
   }
 }
