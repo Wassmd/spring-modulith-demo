@@ -1,4 +1,4 @@
-package com.paxier.spring_modulith_demo.config;
+package com.paxier.spring_modulith_demo;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

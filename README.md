@@ -22,7 +22,8 @@ This project demonstrates **Spring Modulith** - a modular monolith architecture 
 spring-modulith-demo/
 ├── src/main/java/com/paxier/spring_modulith_demo/
 │   ├── Application.java
-│   ├── config/            # JPA and security configuration
+│   ├── JpaConfig.java      # Technical configuration in the root package:
+│   ├── SecurityConfig.java # not part of any application module
 │   ├── customer/          # Customer module (JPA) – public API: CustomerService, Customer, Address, AddressType
 │   │   ├── package-info.java
 │   │   └── internal/     # Controller, entities, repositories and mapper

@@ -1,7 +1,7 @@
 package com.paxier.spring_modulith_demo.order.internal;
 
 import tools.jackson.databind.ObjectMapper;
-import com.paxier.spring_modulith_demo.config.SecurityConfig;
+import com.paxier.spring_modulith_demo.SecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
