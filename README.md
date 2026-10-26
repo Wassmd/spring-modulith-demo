@@ -23,15 +23,9 @@ spring-modulith-demo/
 ├── src/main/java/com/paxier/spring_modulith_demo/
 │   ├── Application.java
 │   ├── config/            # JPA and security configuration
-│   ├── customer/          # Customer module (JPA)
-│   │   ├── controller/    # CustomerController
-│   │   ├── entity/        # CustomerEntity, AddressEntity, AddressType
-│   │   ├── mapper/        # CustomerMapper
-│   │   ├── model/         # Customer, Address
-│   │   ├── service/       # CustomerService
-│   │   ├── CustomerRepository.java
-│   │   ├── AddressRepository.java
-│   │   └── package-info.java
+│   ├── customer/          # Customer module (JPA) – public API: CustomerService, Customer, Address, AddressType
+│   │   ├── package-info.java
+│   │   └── internal/     # Controller, entities, repositories and mapper
 │   ├── order/             # Order module – public API: the event only
 │   │   ├── OrderPlaceEvent.java # Externalized event for kafka
 │   │   ├── package-info.java
@@ -45,9 +39,12 @@ spring-modulith-demo/
 │   │   ├── NotificationService.java
 │   │   ├── Notification.java
 │   │   └── internal/     # Async order listener, delivery repository and REST controller
-│   ├── product/           # Product module (JPA)
+│   ├── product/           # Product module (JPA) – public API: ProductService, Product
+│   │   ├── entity/       # ProductEntity – still exposed as named interface "entity" for Supplier
+│   │   └── internal/     # Controller, repository, mapper and order event listener
 │   ├── shared/            # Shared entity infrastructure
-│   └── supplier/          # Supplier module (JPA)
+│   └── supplier/          # Supplier module (JPA) – public API: SupplierService, Supplier
+│       └── internal/     # Entity, repository and mapper
 └── src/test/java/
     ├── ModularityTests.java   # Module structure verification
     ├── notification/
@@ -57,7 +54,9 @@ spring-modulith-demo/
     └── customer/
         ├── CustomerIntegrationTest.java
         ├── CustomerServiceTest.java
-        └── CustomerControllerTest.java
+        └── internal/
+            ├── CustomerControllerTest.java
+            └── CustomerRepositoryTest.java
 ```
 
 ## 🏗️ Architecture

@@ -1,6 +1,5 @@
 package com.paxier.spring_modulith_demo.order.internal;
 
-import com.paxier.spring_modulith_demo.customer.model.Customer;
 import com.paxier.spring_modulith_demo.payment.service.PaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

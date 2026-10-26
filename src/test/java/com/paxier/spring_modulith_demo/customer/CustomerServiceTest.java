@@ -1,12 +1,10 @@
 package com.paxier.spring_modulith_demo.customer;
 
-import com.paxier.spring_modulith_demo.customer.entity.AddressEntity;
-import com.paxier.spring_modulith_demo.customer.entity.CustomerEntity;
-import com.paxier.spring_modulith_demo.customer.mapper.CustomerMapper;
-import com.paxier.spring_modulith_demo.customer.mapper.CustomerMapperImpl;
-import com.paxier.spring_modulith_demo.customer.model.Address;
-import com.paxier.spring_modulith_demo.customer.model.Customer;
-import com.paxier.spring_modulith_demo.customer.service.CustomerService;
+import com.paxier.spring_modulith_demo.customer.internal.AddressEntity;
+import com.paxier.spring_modulith_demo.customer.internal.CustomerEntity;
+import com.paxier.spring_modulith_demo.customer.internal.CustomerMapper;
+import com.paxier.spring_modulith_demo.customer.internal.CustomerMapperImpl;
+import com.paxier.spring_modulith_demo.customer.internal.CustomerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

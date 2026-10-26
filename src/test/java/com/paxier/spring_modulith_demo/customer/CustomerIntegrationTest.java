@@ -1,8 +1,7 @@
 package com.paxier.spring_modulith_demo.customer;
 
+import com.paxier.spring_modulith_demo.customer.internal.CustomerRepository;
 import tools.jackson.databind.ObjectMapper;
-import com.paxier.spring_modulith_demo.customer.model.Address;
-import com.paxier.spring_modulith_demo.customer.model.Customer;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
