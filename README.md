@@ -342,6 +342,11 @@ After running tests, check `target/spring-modulith-docs/`:
 - `module-notification.puml` - Notification module diagram
 - `all-docs.adoc` - Complete documentation
 
+The diagrams use `ElementsWithoutRelationships.VISIBLE`, so modules without
+dependencies (Customer, Config) are shown too. To render the `.puml` files,
+install Graphviz (`brew install graphviz`) and use the IntelliJ PlantUML
+Integration plugin.
+
 ## ⚙️ Configuration
 
 ### application.yml
