@@ -22,14 +22,27 @@
         <springdoc-openapi-starter-webmvc-ui.version>3.1.1</springdoc-openapi-starter-webmvc-ui.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.modulith</groupId>
+                <artifactId>spring-modulith-bom</artifactId>
+                <version>${spring-modulith.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.modulith</groupId>
-            <artifactId>spring-modulith-events-api</artifactId>
+            <artifactId>spring-modulith-starter-jdbc</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.modulith</groupId>
-            <artifactId>spring-modulith-starter-jdbc</artifactId>
+            <artifactId>spring-modulith-events-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.modulith</groupId>
@@ -139,17 +152,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.modulith</groupId>
-                <artifactId>spring-modulith-bom</artifactId>
-                <version>${spring-modulith.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
 	<build>
 		<plugins>

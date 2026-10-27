@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.modulith.Modulith;
 import org.springframework.scheduling.annotation.EnableAsync;
 
-@Modulith
+@Modulith  //show
 @EnableAsync
 public class Application {
 

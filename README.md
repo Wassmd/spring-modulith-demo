@@ -1,18 +1,17 @@
 # Spring Modulith Demo
 
-This project demonstrates **Spring Modulith** - a modular monolith architecture using Spring Boot. It showcases how to build a well-structured application with clear module boundaries, inter-module communication via Spring Events, and event externalization to Apache Kafka. Later on if needed, this one of module can be separated out into a µ-services.
+This project demonstrates **Spring Modulith** - a modular monolith architecture using Spring Boot. It showcases how to build a well-structured application with clear module boundaries, inter-module communication via Spring Events, and event externalization to Apache Kafka. If needed later, a single module can be extracted into its own microservice.
 
 ## 🎯 Key Features
 
-- **Package-based Module Separation**: Application is organized into distinct modules, including `order`, `inventory` and `notification`
+- **Package-based Module Separation**: Eight modules (`customer`, `order`, `payment`, `inventory`, `notification`, `product`, `supplier`, `shared`), each hiding its implementation in an `internal` package
 - **Synchronous Stock Reservation**: Order calls the public Inventory API in the same database transaction, preventing overselling with atomic stock updates
 - **Asynchronous Notifications**: A transactional module listener queues one persistent notification per order after commit; failed processing remains recoverable
 - **Event-Driven Communication**: Modules communicate using Spring's `ApplicationEventPublisher` 
 - **Kafka Event Externalization**: Internal events annotated with `@Externalized` are published to Kafka by Spring Modulith
 - **Event Publication Tracking**: JDBC-based event publication registry automatically creates `event_publication` table to track event status
-- **OAuth2/OIDC Authentication**: Secured with Keycloak for enterprise-grade authentication and authorization
-- **Role-Based Access Control**: Fine-grained authorization using Keycloak realm and client roles
-- **Modularity Verification**: Unit tests verify module structure and dependencies
+- **OAuth2/OIDC with Keycloak**: JWT resource server with Keycloak roles (relaxed for the live demo, see [Security](#-security--authentication))
+- **Modularity Verification**: Unit tests and startup verification enforce module boundaries
 - **Auto-generated Documentation**: PlantUML diagrams and module documentation generated from code
 
 ## 📦 Project Structure
@@ -28,35 +27,36 @@ spring-modulith-demo/
 │   │   ├── package-info.java
 │   │   └── internal/     # Controller, entities, repositories and mapper
 │   ├── order/             # Order module – public API: the event only
-│   │   ├── OrderPlacedEvent.java # Externalized event for kafka
-│   │   ├── package-info.java
+│   │   ├── OrderPlacedEvent.java # Externalized to Kafka topic "order-created"
+│   │   ├── package-info.java     # allowedDependencies = {"payment :: service", "inventory"}
 │   │   └── internal/     # Entities, repository, service and REST controller
-│   ├── payment/           # Payment module
+│   ├── payment/           # Payment module – exposes only its named interfaces
+│   │   ├── model/        # @NamedInterface("model"): PaymentStatus
+│   │   └── service/      # @NamedInterface("service"): PaymentService
 │   ├── inventory/         # Public stock API
 │   │   ├── InventoryService.java
 │   │   ├── InventoryItem.java
+│   │   ├── InsufficientStockException.java
 │   │   └── internal/     # JDBC stock repository and REST controller
 │   ├── notification/      # Public notification query API
 │   │   ├── NotificationService.java
 │   │   ├── Notification.java
 │   │   └── internal/     # Async order listener, delivery repository and REST controller
 │   ├── product/           # Product module (JPA) – public API: ProductService, Product
-│   │   └── internal/     # Entity, controller, repository, mapper and order event listener
-│   ├── shared/            # Shared entity infrastructure
+│   │   └── internal/     # Entity, controller, repository and mapper
+│   ├── shared/            # OPEN module: shared entity infrastructure
+│   │   └── entity/       # AuditedEntity
 │   └── supplier/          # Supplier module (JPA) – public API: SupplierService, Supplier
 │       └── internal/     # Entity (references products by ID only), repository and mapper
 └── src/test/java/
-    ├── ModularityTests.java   # Module structure verification
+    ├── ModularityTests.java   # verify() + Documenter
+    ├── customer/              # Service, integration, controller and repository tests
+    ├── order/internal/        # Service, controller, integration and workflow tests
     ├── notification/
     │   ├── NotificationModuleTest.java      # @ApplicationModuleTest + Scenario
-    │   └── internal/
-    │       └── OrderPlacedListenerTest.java # Plain unit test with Mockito
-    └── customer/
-        ├── CustomerIntegrationTest.java
-        ├── CustomerServiceTest.java
-        └── internal/
-            ├── CustomerControllerTest.java
-            └── CustomerRepositoryTest.java
+    │   └── internal/                        # Listener unit test, recovery integration test
+    ├── product/internal/      # Repository test
+    └── supplier/internal/     # Repository test
 ```
 
 ## 🏗️ Architecture
@@ -82,18 +82,25 @@ spring-modulith-demo/
 - **Communication**: Publishes `OrderPlacedEvent` to Kafka
 - **Event Tracking**: Spring Modulith uses JDBC for its `event_publication` table, independently of JPA entity persistence
 
-#### 3. Product Module
-- **Service Layer**: Business logic for products
+#### 3. Payment Module
+- **Named Interfaces**: Only `payment.service` and `payment.model` are accessible from other modules.
+- **Usage**: Order is allowed to use `payment :: service` only (`allowedDependencies`).
+- **Scope**: `PaymentService` is a stub that returns a payment status.
 
-#### 4. Inventory Module
+#### 4. Product and Supplier Modules (JPA)
+- **Product**: Owns the `product` schema; exposes `ProductService` and the `Product` record.
+- **Supplier**: Stores only `productId` (no JPA relation and no foreign key to Product's table).
+- **Shared**: An `OPEN` module with `AuditedEntity`, used by Product and Supplier.
+
+#### 5. Inventory Module
 - **API**: `InventoryService` exposes `getStock`, `addStock` and `reserve(items)` using `InventoryItem(productId, quantity)`.
 - **Persistence**: Owns `inventory.stock`; other modules do not access this table directly.
 - **Transactions**: `reserve` uses `Propagation.MANDATORY`, so it always joins the caller's transaction. Order, stock changes and event publications commit or roll back together.
 - **Concurrency**: `UPDATE ... SET quantity = quantity - ? WHERE quantity >= ?` checks and decreases stock in one atomic statement, so concurrent orders cannot oversell.
-- **Endpoints**: `GET /inventory/{productId}` returns available quantity (zero for an unstocked product); `POST /inventory/{productId}/stock` adds a positive quantity and requires the `admin` role.
+- **Endpoints**: `GET /inventory/{productId}` returns available quantity (zero for an unstocked product); `POST /inventory/{productId}/stock` adds a positive quantity (its `admin` check is currently disabled for the demo).
 - **Scope**: Kept intentionally simple: no reservation history, cancellation or idempotency. Products are referenced by ID only.
 
-#### 5. Notification Module
+#### 6. Notification Module
 - **Integration**: `@ApplicationModuleListener` consumes `OrderPlacedEvent` asynchronously after a successful commit, in its own transaction. Async processing is enabled on `Application`.
 - **Persistence**: Owns `notification.delivery`; `(order_id, kind)` is the primary key, so retries cannot create a second order confirmation job.
 - **Endpoint**: `GET /notifications/orders/{orderId}` returns a queued notification or HTTP 404 if it is not yet available.
@@ -105,11 +112,11 @@ spring-modulith-demo/
 1. **Order Creation**: `OrderController` receives HTTP POST request
 2. **Synchronous Reservation**: `OrderService` saves the order and calls `InventoryService.reserve`. Missing or insufficient stock raises HTTP 409 and rolls back the transaction.
 3. **Internal Event**: `OrderService` publishes `OrderPlacedEvent` using `ApplicationEventPublisher`. The event contains immutable item snapshots rather than JPA entities, retaining the JSON fields `id`, `productId` and `quantity`.
-4. **Commit**: The existing demo payment call remains inside the transaction. A thrown payment error rolls back the order, stock changes and event publications.
+4. **Commit**: The demo payment call (`payment :: service`) runs inside the transaction. A thrown payment error rolls back the order, stock changes and event publications.
 5. **Asynchronous Reactions**: After commit, Notification queues a delivery job; Kafka externalization publishes the event to `order-created`.
 6. **Event Tracking**: Spring Modulith JDBC records publications per transactional listener in `event_publication`. Notification can lag behind order creation and must be queried separately.
 
-Inventory does not depend on Order. Order depends on Inventory's public API, and Notification depends on Order's public event. Both new modules keep repositories and controllers in internal packages. Flyway migrations create separate schemas in the same PostgreSQL database; schemas document ownership but are not access-control barriers when using one database user.
+Inventory does not depend on Order. Order depends on Inventory's public API, and Notification depends on Order's public event. All modules keep repositories and controllers in internal packages. Flyway migrations create separate schemas in the same PostgreSQL database; schemas document ownership but are not access-control barriers when using one database user.
 
 ### Database Migrations (Flyway)
 
@@ -204,9 +211,10 @@ may run again after a crash; Notification therefore deduplicates delivery jobs.
 
    The application will:
    - Start on `http://localhost:8080`
-   - Auto-create the `event_publication` table
+   - Run the Flyway migrations (module schemas and `event_publication`)
+   - Verify the module structure (fails fast on violations)
    - Connect to Kafka at `localhost:9092`
-   - Validate JWT tokens from Keycloak
+   - Validate JWT tokens from Keycloak, if a token is sent
 
 4. **Get Access Token**:
    ```bash
@@ -219,8 +227,8 @@ may run again after a crash; Notification therefore deduplicates delivery jobs.
      -d "grant_type=password" | jq -r '.access_token')
    ```
 
-5. **Create an Order** (Protected Endpoint):
-   First add stock using a token with the `admin` role:
+5. **Create an Order**:
+   First add stock:
    ```bash
    curl -X POST http://localhost:8080/inventory/101/stock \
      -H "Authorization: Bearer $TOKEN" \
@@ -228,7 +236,7 @@ may run again after a crash; Notification therefore deduplicates delivery jobs.
      -d '{"quantity":10}'
    ```
 
-   Then place the order using an authenticated user's token. Stock is **not**
+   Then place the order. Stock is **not**
    seeded automatically: missing or insufficient stock returns HTTP 409.
    ```bash
    curl -X POST http://localhost:8080/orders \
@@ -268,23 +276,12 @@ may run again after a crash; Notification therefore deduplicates delivery jobs.
    
    This demonstrates **JPA's OneToMany relationship**: a customer can have multiple addresses linked through the `customer_id` foreign key.
 
-7. **Get All Customers** (Protected Endpoint):
+7. **Get All Customers**:
    ```bash
    curl -H "Authorization: Bearer $TOKEN" http://localhost:8080/customers
    ```
 
-8. **Verify Kafka Message**:
-   ```bash
-   # Consume messages directly (no need to enter the container)
-   docker exec -it spring-modulith-demo-kafka-1 kafka-console-consumer \
-     --bootstrap-server localhost:9092 --topic order-created --from-beginning
-   ```
-
-   > The Confluent image ships the CLI tools without the `.sh` suffix
-   > (`kafka-console-consumer`, not `kafka-console-consumer.sh`).
-   > Drop `--from-beginning` to only read new messages, and press `Ctrl+C` to stop.
-
-   You'll see JSON messages like:
+8. **Verify Kafka Message**: see [View Kafka Topics and Messages](#view-kafka-topics-and-messages). Each message looks like:
    ```json
    {
      "orderId": 1,
@@ -329,24 +326,20 @@ without starting Docker Compose or connecting to Kafka:
 
 Integration tests use the existing Zonky embedded PostgreSQL dependency.
 The workflow tests cover commit and rollback, insufficient stock, duplicate
-product lines, concurrent reservations, replay-safe notification jobs, request
-validation and admin-only stock additions. The recovery test deliberately
+product lines, concurrent reservations, replay-safe notification jobs and request
+validation. The recovery test deliberately
 fails a notification listener and resubmits its persisted event publication.
-The existing Order integration test's local transaction tests are retained.
 
 ### Generated Documentation
 
 After running tests, check `target/spring-modulith-docs/`:
-- `components.puml` - Overall architecture diagram
-- `module-order.puml` - Order module diagram
-- `module-customer.puml` - Customer module diagram
-- `module-product.puml` - Product module diagram
-- `module-inventory.puml` - Inventory module diagram
-- `module-notification.puml` - Notification module diagram
+- `components.puml` - Overall architecture diagram (rendered above)
+- `module-<name>.puml` / `module-<name>.adoc` - One diagram and description per module
+  (customer, inventory, notification, order, payment, product, shared, supplier)
 - `all-docs.adoc` - Complete documentation
 
 The diagrams use `ElementsWithoutRelationships.VISIBLE`, so modules without
-dependencies (Customer, Config) are shown too. To render the `.puml` files,
+dependencies (Customer) are shown too. To render the `.puml` files,
 install Graphviz (`brew install graphviz`) and use the IntelliJ PlantUML
 Integration plugin.
 
@@ -380,13 +373,10 @@ spring:
 
 ### Public Endpoints
 
-The following endpoints don't require authentication:
-- `/actuator/**` - Actuator endpoints
-- `/apidoc/**` - Swagger UI
-- `/v3/api-docs/**` - OpenAPI documentation
-- `/swagger-ui/**` - Swagger UI resources
-
-All other endpoints require a valid JWT token from Keycloak.
+For the live demo, `SecurityConfig` currently permits **all** requests
+(`"/**"` is in the `permitAll()` list), so no token is needed for orders,
+inventory or notifications. Remove `"/**"` to require a valid JWT for every
+endpoint except `/actuator/**`, `/apidoc/**`, `/v3/api-docs/**` and `/swagger-ui/**`.
 
 ## 🔐 Security & Authentication
 
@@ -403,19 +393,17 @@ This application uses **OAuth2/OIDC** with Keycloak for authentication and autho
 
 ### Role-Based Authorization
 
-You can secure methods using `@PreAuthorize`:
+Method security is enabled. Creating a customer requires the `admin` role,
+even while the URL rules above are relaxed:
 
 ```java
+@PostMapping
 @PreAuthorize("hasRole('admin')")
-public void deleteOrder(int orderId) {
-    // Only admins can delete
-}
-
-@PreAuthorize("hasAnyRole('user', 'customer')")
-public Order getOrder(int orderId) {
-    // Users and customers can view
-}
+public Customer createCustomer(...) { ... }
 ```
+
+The `admin` check on `POST /inventory/{productId}/stock` is commented out for
+the demo; the matching test `shouldRequireAdminToAddStock` is `@Disabled`.
 
 ### Keycloak Setup
 
@@ -428,14 +416,19 @@ See [KEYCLOAK_SETUP.md](KEYCLOAK_SETUP.md) for detailed instructions on:
 ## 📚 Spring Modulith Concepts
 
 ### 1. Module Definition
-Each top-level package under the main package is a module:
-- `com.paxier.spring_modulith_demo.customer` → Customer module
-- `com.paxier.spring_modulith_demo.order` → Order module
-- `com.paxier.spring_modulith_demo.product` → Product module
-- `com.paxier.spring_modulith_demo.inventory` → Inventory module
-- `com.paxier.spring_modulith_demo.notification` → Notification module
+Each direct sub-package of the main package is a module: `customer`, `order`,
+`payment`, `inventory`, `notification`, `product`, `supplier` and `shared`.
+Types in the root package (`Application`, `JpaConfig`, `SecurityConfig`) belong
+to no module. Sub-packages such as `internal` are hidden from other modules.
 
-### 2. Module Communication
+### 2. Allowed Dependencies and Named Interfaces
+`package-info.java` declares what a module may use, for example in Order:
+```java
+@ApplicationModule(allowedDependencies = {"payment :: service", "inventory"})
+```
+`payment :: service` refers to the `@NamedInterface("service")` package of Payment.
+
+### 3. Module Communication
 Modules use **public APIs** when an immediate transactional result is required
 and **Spring Application Events** for decoupled reactions:
 ```java
@@ -448,12 +441,7 @@ void onOrderPlaced(OrderPlacedEvent event) {
     // Handle event
 }
 ```
-
-### 4. Event Publication Registry
-The `event_publication` table tracks:
-- **Pending events**: Not yet published to external systems
-- **Completed events**: Successfully published
-- **Failed events**: Can be republished on restart
+Event persistence is described in [Event Publication Table](#event-publication-table).
 
 ## 🔍 Verification
 
@@ -471,22 +459,13 @@ This endpoint shows:
 - Module dependencies
 - Event listeners and publishers
 - Externalized events configuration
-- 
-### Check Event Publication Table
 
-```sql
-SELECT * FROM event_publication;
-```
-
-### View Kafka Topics
+### View Kafka Topics and Messages
 
 ```bash
 docker exec -it spring-modulith-demo-kafka-1 kafka-topics \
   --list --bootstrap-server localhost:9092
 ```
-
-### Monitor Kafka Messages
-
 ```bash
 # Read all messages from the beginning
 docker exec -it spring-modulith-demo-kafka-1 kafka-console-consumer \
@@ -505,7 +484,8 @@ docker exec -it spring-modulith-demo-kafka-1 kafka-console-consumer \
 ```
 
 > **Note:** `spring-modulith-demo-kafka-1` is the container name created by
-> `compose.yaml`. If yours differs, find it with `docker ps`.
+> `compose.yaml`. If yours differs, find it with `docker ps`. The Confluent image
+> ships the CLI tools without the `.sh` suffix.
 
 ## 🛠️ Technology Stack
 
